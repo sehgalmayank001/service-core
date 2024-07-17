@@ -8,6 +8,12 @@ Install the gem and add to the application's Gemfile by executing:
 ```sh
 bundle add service_core
 ```
+Or in your Gemfile:
+
+```ruby
+gem "service_core"
+```
+
 If bundler is not being used to manage dependencies, install the gem by executing:
 
 ```sh
