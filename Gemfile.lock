@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     service_core (0.1.0)
-      activemodel (>= 6.1)
-      activesupport (>= 6.1)
+      activemodel (>= 6.1, < 8.0)
+      activesupport (>= 6.1, < 8.0)
 
 GEM
   remote: https://rubygems.org/
@@ -80,6 +80,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-23
+  x86_64-linux
 
 DEPENDENCIES
   byebug
