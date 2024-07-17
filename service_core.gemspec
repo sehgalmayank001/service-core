@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "A Rails service pattern implementation"
   spec.description   = "A service pattern implementation for Rails applications."
-  # spec.homepage = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage = "https://github.com/sehgalmayank001/service-core"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
 
@@ -32,8 +32,8 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activemodel", ">= 6.1"
-  spec.add_dependency "activesupport", ">= 6.1"
+  spec.add_runtime_dependency "activemodel", ">= 6.1", "< 8.0"
+  spec.add_runtime_dependency "activesupport", ">= 6.1", "< 8.0"
 
 
   # Uncomment to register a new dependency of your gem
