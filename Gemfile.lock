@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     service_core (0.1.0)
-      activemodel (>= 4.0)
-      activesupport (>= 4.0)
+      activemodel (>= 6.1)
+      activesupport (>= 6.1)
 
 GEM
   remote: https://rubygems.org/
