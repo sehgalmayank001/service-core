@@ -16,6 +16,6 @@ task :release do
   version = `ruby -r ./lib/service_core/version -e "puts ServiceCore::VERSION"`.strip
   # sh "git add ."
   # sh "git commit -m 'Prepare for version #{version} release'"
-  sh "git tag v#{version}"
-  sh "git push origin main --tags"
+  # sh "git tag v#{version}"
+  # sh "git push origin main --tags"
 end
