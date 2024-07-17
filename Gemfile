@@ -11,4 +11,5 @@ group :development do
   gem "byebug"
   gem "rspec", "~> 3.0"
   gem "rubocop", "~> 1.21"
+  gem "rubocop-rspec"
 end

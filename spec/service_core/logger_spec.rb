@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # spec/service_core/errors_spec.rb
 
 require "spec_helper"

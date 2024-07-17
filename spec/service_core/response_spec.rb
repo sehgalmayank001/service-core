@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # spec/service_core/responses_spec.rb
 
 require "spec_helper"
@@ -32,12 +34,64 @@ RSpec.describe ServiceCore::Response do
     end
   end
 
-  describe "#pending_response" do
-    it "returns a pending response with a message and data" do
-      response = service.send(:pending_response, message: "Pending", data: { key: "value" })
-      expect(response[:status]).to eq("pending")
-      expect(response[:message]).to eq("Pending")
-      expect(response[:data]).to eq(key: "value")
+  describe "#formatted_response" do
+    before do
+      service.instance_variable_set(:@output, {})
+    end
+
+    context "when all arguments are provided" do
+      it "sets the output with all provided values" do
+        status = "success"
+        message = "Operation successful"
+        data = { key: "value" }
+        errors = { field: ["error message"] }
+
+        result = service.send(:formatted_response, status: status, message: message, data: data, errors: errors)
+
+        expect(result[:status]).to eq(status)
+        expect(result[:message]).to eq(message)
+        expect(result[:data]).to eq(data)
+        expect(result[:errors]).to eq(errors)
+      end
+    end
+
+    context "when optional arguments are not provided" do
+      it "sets the output with only the status" do
+        status = "success"
+
+        result = service.send(:formatted_response, status: status)
+
+        expect(result[:status]).to eq(status)
+        expect(result[:message]).to be_nil
+        expect(result[:data]).to be_nil
+        expect(result[:errors]).to be_nil
+      end
+
+      it "sets the output with status and message" do
+        status = "error"
+        message = "Something went wrong"
+
+        result = service.send(:formatted_response, status: status, message: message)
+
+        expect(result[:status]).to eq(status)
+        expect(result[:message]).to eq(message)
+        expect(result[:data]).to be_nil
+        expect(result[:errors]).to be_nil
+      end
+    end
+
+    context "when errors are provided" do
+      it "formats errors correctly" do
+        status = "error"
+        errors = { field: ["error message"] }
+
+        allow(service).to receive(:error_messages).with(errors).and_return(errors)
+
+        result = service.send(:formatted_response, status: status, errors: errors)
+
+        expect(result[:status]).to eq(status)
+        expect(result[:errors]).to eq(errors)
+      end
     end
   end
 end

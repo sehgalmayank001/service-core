@@ -10,19 +10,15 @@ module ServiceCore
     protected
 
     def success_response(message: nil, data: nil)
-      _response(status: "success", message: message, data: data)
+      formatted_response(status: "success", message: message, data: data)
     end
 
     def error_response(message:, errors: nil)
-      _response(status: "error", message: message, errors: errors)
-    end
-
-    def pending_response(message: nil, data: nil, errors: nil)
-      _response(status: "pending", message: message, data: data, errors: errors)
+      formatted_response(status: "error", message: message, errors: errors)
     end
 
     # set output response
-    def _response(status:, message: nil, data: nil, errors: nil)
+    def formatted_response(status:, message: nil, data: nil, errors: nil)
       @output[:status] = status
       @output[:message] = message if message.present?
       @output[:data] = data if data.present?

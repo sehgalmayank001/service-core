@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["sehgalmayank001@gmail.com"]
 
   spec.summary       = "A Rails service pattern implementation"
-  spec.description   = "A service pattern implementation for Rails applications, supporting validations and error handling."
+  spec.description   = "A service pattern implementation for Rails applications."
   # spec.homepage = "TODO: Put your gem's website or public repo URL here."
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
@@ -40,29 +40,4 @@ Gem::Specification.new do |spec|
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
-end
-
-
-# service_core.gemspec
-
-Gem::Specification.new do |spec|
-  spec.name          = "service_core"
-  spec.version       = ServiceCore::VERSION
-  spec.authors       = ["Your Name"]
-  spec.email         = ["your.email@example.com"]
-
-  spec.summary       = "A Rails service pattern implementation"
-  spec.description   = "A service pattern implementation for Rails applications, supporting validations and error handling."
-  spec.homepage      = "https://your-gem-homepage.com"
-
-  spec.files         = Dir["lib/**/*.rb"]
-  spec.bindir        = "exe"
-  spec.require_paths = ["lib"]
-
-  spec.add_dependency "activemodel", ">= 4.0", "< 7.0"
-  spec.add_dependency "activesupport", ">= 4.0", "< 7.0"
-
-  spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://your-gem-source-code-repo.com"
-  spec.metadata["changelog_uri"] = "https://your-gem-changelog.com"
 end

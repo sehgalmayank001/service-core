@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "active_support/concern"
 require "active_model"
 require_relative "response"
@@ -13,7 +14,7 @@ module ServiceCore
       include ActiveModel::Validations
       include ServiceCore::Response
 
-           # NOTE: output attribute will hold output of the service
+      # NOTE: output attribute will hold output of the service
       attr_reader :output
 
       # NOTE: fields attribute will hold the fields defined and their values
@@ -36,7 +37,7 @@ module ServiceCore
           # ActiveModel::Attributes support only basic data types
           # for ActiveRecord objects we use attr_accessor through ActiveModel::Model
           # define attr_accessor to make instance variables also available for attributes
-          
+
           # define attribute if type is available to type cast
           if type
             attribute(name, type, default: default)
@@ -58,7 +59,7 @@ module ServiceCore
         @local_errors = {}
         @fields = {}
         # NOTE: this helps identify values passed from values updated
-        self.class.fields_defined.each do |name, _value|
+        self.class.fields_defined.each_key do |name|
           @fields[name] = send(name)
         end
 
@@ -77,7 +78,7 @@ module ServiceCore
         output
       end
 
-      protected
+      private
 
       # output writer is protected to be used inside class and sub-classes only
       attr_writer :output

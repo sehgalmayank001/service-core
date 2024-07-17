@@ -7,7 +7,6 @@ module ServiceCore
     extend ActiveSupport::Concern
 
     included do
-
       # NOTE: #
       # added this to support partial validation
       # valid? method empties all errors, so needed a way to hold errors from within method invocation
@@ -30,15 +29,15 @@ module ServiceCore
 
       def add_error(attribute, message, options = {})
         value = options.present? ? [message, options] : message
-        if @local_errors[attribute].present?
-          @local_errors[attribute] = Array(@local_errors[attribute]) << value
-        else
-          @local_errors[attribute] = [value]
-        end
+        @local_errors[attribute] = if @local_errors[attribute].present?
+                                     Array(@local_errors[attribute]) << value
+                                   else
+                                     [value]
+                                   end
       end
 
       # method to add partial errors and validate
-      def add_error_and_validate(attribute, message, options = {})
+      def add_error_and_validate(attribute, message, _options = {})
         add_error(attribute, message, {})
         valid?
       end
