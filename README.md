@@ -1,6 +1,6 @@
 # ServiceCore
 
-ServiceCore provides a standardized way to define and use service objects in your Ruby and Rails applications. It includes support for defining fields, validations, responses, and logging.
+ServiceCore provides a standardized way to define and use service objects in Ruby and Rails applications. It includes support for defining fields, validations, responses, and error logging. This approach is inspired by the DRY (Don't Repeat Yourself) principle and Rails' convention over configuration philosophy.
 
 ## Installation
 Install the gem and add to the application's Gemfile by executing:
