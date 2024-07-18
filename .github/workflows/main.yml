@@ -18,7 +18,7 @@ jobs:
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
         with:
-          ruby-version: 2.6.10
+          ruby-version: 2.7.8
           bundler-cache: true
       - name: Run Rubocop
         run: bundle exec rubocop --force-exclusion
@@ -30,7 +30,7 @@ jobs:
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
         with:
-          ruby-version: 2.6.10
+          ruby-version: 2.7.8
           bundler-cache: true
       - name: Run tests
         run: bundle exec rspec
