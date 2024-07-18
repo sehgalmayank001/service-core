@@ -1,5 +1,9 @@
+require:
+  - rubocop-rspec
+
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 2.7
+  NewCops: enable
 
 Style/StringLiterals:
   Enabled: true
@@ -16,4 +20,16 @@ Style/Documentation:
   Enabled: false
 
 Metrics/BlockLength:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/VerifiedDoubleReference:
   Enabled: false

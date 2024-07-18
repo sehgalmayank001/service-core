@@ -6,28 +6,31 @@ require "spec_helper"
 
 RSpec.describe ServiceCore do
   it "has a version number" do
-    expect(ServiceCore::VERSION).not_to be nil
+    expect(ServiceCore::VERSION).not_to be_nil
   end
 
   describe ".logger" do
     before do
       # Reset the logger before each example
-      ServiceCore.instance_variable_set(:@logger, nil)
+      described_class.instance_variable_set(:@logger, nil)
     end
 
     context "when Rails is defined" do
       before do
-        stub_const("Rails", double(logger: Logger.new(nil)))
+        logger_double = instance_double(Logger)
+        allow(logger_double).to receive(:info)
+        rails_double = instance_double("Rails", logger: logger_double)
+        stub_const("Rails", rails_double)
       end
 
       it "uses the Rails logger" do
-        expect(ServiceCore.logger).to eq(Rails.logger)
+        expect(described_class.logger).to eq(Rails.logger)
       end
     end
 
     context "when Rails is not defined" do
       it "uses the default logger" do
-        expect(ServiceCore.logger).to be_a(ActiveSupport::Logger)
+        expect(described_class.logger).to be_a(ActiveSupport::Logger)
       end
     end
   end
@@ -35,10 +38,10 @@ RSpec.describe ServiceCore do
   describe ".configure" do
     it "allows the logger to be configured" do
       custom_logger = Logger.new(nil)
-      ServiceCore.configure do |config|
+      described_class.configure do |config|
         config.logger = custom_logger
       end
-      expect(ServiceCore.logger).to eq(custom_logger)
+      expect(described_class.logger).to eq(custom_logger)
     end
   end
 end
