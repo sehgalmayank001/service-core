@@ -1,6 +1,6 @@
 # ServiceCore
 
-ServiceCore provides a standardized way to define and use service objects in Ruby and Rails applications. It includes support for defining fields, validations, responses, and error logging. This approach is inspired by the DRY (Don't Repeat Yourself) principle and Rails' convention over configuration philosophy.
+ServiceCore provides a standardized way to define and use service objects in Ruby and Rails applications. It includes support for specifying fields, validations, responses, and error logging. This approach is inspired by the DRY (Don't Repeat Yourself) principle and Rails' convention over configuration philosophy.
 
 ## Installation
 Install the gem and add to the application's Gemfile by executing:
@@ -14,25 +14,51 @@ Or in your Gemfile:
 gem "service_core"
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+If the bundler is not being used to manage dependencies, install the gem by executing:
 
 ```sh
 gem install service_core
 ```
+
+### Service Response Structure
+The idea is to define a convention that the response from a service can have only four keys:
+- status
+- data
+- message
+- errors
+
+The data type of any of the above keys is not enforced, giving the developer flexibility to return based on the use case, but should follow this response structure.
 ## Usage
 
 ### Defining a Service
 
-To define a new service, include the `ServiceCore` module in your service class and define your fields and the perform method.
+To define a new service, include the `ServiceCore` module in your service class and define your fields and the `perform` method.
 ```ruby
-# app/services/my_service.rb
-
 class MyService
   include ServiceCore
 
   field :first_name, :string
   field :last_name, :string
   field :active, :boolean, default: true
+
+  def perform
+    success_response(message: "Hello, World", data: name)
+  end
+
+  def name
+    "#{first_name} #{last_name}"
+  end
+end
+```
+### `field` method
+The `field` method can define primitive types and objects, like hash/array or any object. For objects, there is no need to declare the datatype.
+```ruby
+class MyService
+  include ServiceCore
+
+  field :first_name, :string
+  field :last_name, :string
+  field :payload # can be object/hash/array
 
   def perform
     success_response(message: "Hello, World", data: name)
@@ -66,8 +92,20 @@ puts service.output
 # }
 ```
 
+The `call` method can be invoked on the service class and it too will return the output/result of the service.
+```ruby
+result = MyService.call(first_name: "John", last_name: "Doe")
+puts result
+# Output:
+# {
+#   status: "success",
+#   message: "Hello, World",
+#.  data: "John Doe"
+# }
+```
+
 ### Validations
-You can define validation on the service and  those will be invoked before service logic is invoked
+Define validation on the service and those will be invoked before service logic is invoked.
 ```ruby
 class MyService
   include ServiceCore
@@ -92,7 +130,7 @@ puts result
 ```
 
 ### Step Validation
-You can perform validation at each step of service logic. This is helpful when result of previous step decides next logic.
+Perform validation at each step of service logic. This is helpful when the result of the previous step decides the next logic.
 ```ruby
 class MyService
   include ServiceCore
@@ -124,7 +162,7 @@ MyService.call(first_name: 'abc')
 ```
 
 ### Logging Errors
-You can log errors using the `log_error` method.
+Log errors using the `log_error` method.
 ```ruby
 class MyService
   include ServiceCore
@@ -154,7 +192,7 @@ puts result
 ```
 
 ### Configuring the Logger
-You can configure the logger for the ServiceCore module.
+Configure the logger for the ServiceCore module.
 ```ruby
 ServiceCore.configure do |config|
   config.logger = Logger.new(STDOUT)
@@ -162,7 +200,7 @@ end
 ```
 
 ### Custom Response
-use `formatted_response` method to return any other status other than `success` or `error`
+Use the `formatted_response` method to return any status other than `success` or `error`.
 ```ruby
 
 class MyService
