@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 require "active_support/concern"
+require_relative "output"
 # require "active_model/errors"
 
 module ServiceCore
   module Response
     extend ActiveSupport::Concern
+
+    include ServiceCore::Output
 
     protected
 
@@ -19,11 +22,11 @@ module ServiceCore
 
     # set output response
     def formatted_response(status:, message: nil, data: nil, errors: nil)
-      @output[:status] = status
-      @output[:message] = message if message.present?
-      @output[:data] = data if data.present?
-      @output[:errors] = error_messages(errors) if errors.present?
-      @output
+      set_output(:status, status)
+      set_output(:message, message) if message.present?
+      set_output(:data, data) if data.present?
+      set_output(:errors, error_messages(errors)) if errors.present?
+      output
     end
 
     def error_messages(errors)

@@ -44,4 +44,12 @@ RSpec.describe ServiceCore::Base do
       expect { TestService2.new.call }.to raise_error(StandardError, "perform method not implemented")
     end
   end
+
+  describe ".call" do
+    it "returns the ervie class object" do
+      response = TestService.call(name: "World")
+      expect(response).to be_an_instance_of(TestService)
+      expect(response.output[:message]).to eq("Hello, World")
+    end
+  end
 end

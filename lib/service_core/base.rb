@@ -9,13 +9,12 @@ module ServiceCore
     extend ActiveSupport::Concern
 
     included do
+      # ServiceCore::Response is included first as it inherited output,
+      # which too has initialize method.
+      include ServiceCore::Response
       include ActiveModel::Model
       include ActiveModel::Attributes
       include ActiveModel::Validations
-      include ServiceCore::Response
-
-      # NOTE: output attribute will hold output of the service
-      attr_reader :output
 
       # NOTE: fields attribute will hold the fields defined and their values
       attr_reader :fields
@@ -50,7 +49,9 @@ module ServiceCore
         end
 
         def call(attributes = {})
-          new(attributes).call
+          obj = new(attributes)
+          obj.call
+          obj
         end
       end
 
@@ -62,9 +63,6 @@ module ServiceCore
         self.class.fields_defined.each_key do |name|
           @fields[name] = send(name)
         end
-
-        # default value of output
-        @output = { status: "initialized" }
       end
 
       def call
@@ -74,14 +72,14 @@ module ServiceCore
         # perform the operation
         perform
 
+        # auto assign status if output is dirty
+        auto_assign_status
+
         # return output
         output
       end
 
       private
-
-      # output writer is protected to be used inside class and sub-classes only
-      attr_writer :output
 
       def perform
         raise StandardError, "perform method not implemented"
