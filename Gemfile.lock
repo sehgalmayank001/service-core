@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    service_core (0.2.1)
+    service_core (0.2.0)
       activemodel (>= 6.1, < 8.0)
       activesupport (>= 6.1, < 8.0)
 
