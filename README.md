@@ -50,25 +50,6 @@ class MyService
   end
 end
 ```
-### `field` method
-The `field` method can define primitive types and objects, like hash/array or any object. For objects, there is no need to declare the datatype.
-```ruby
-class MyService
-  include ServiceCore
-
-  field :first_name, :string
-  field :last_name, :string
-  field :payload # can be object/hash/array
-
-  def perform
-    success_response(message: "Hello, World", data: name)
-  end
-
-  def name
-    "#{first_name} #{last_name}"
-  end
-end
-```
 
 ### Using a Service
 Instantiate and call the service to execute it. The call method will validate the input, perform the operation, and return the output.
@@ -92,9 +73,94 @@ puts service.output
 # }
 ```
 
-The `call` method can be invoked on the service class and it too will return the output/result of the service.
+The `call` method can be invoked on the service class and it too will return the object of the service.
 ```ruby
-result = MyService.call(first_name: "John", last_name: "Doe")
+obj = MyService.call(first_name: "John", last_name: "Doe")
+puts obj.output
+# Output:
+# {
+#   status: "success",
+#   message: "Hello, World",
+#.  data: "John Doe"
+# }
+```
+
+### `field` method
+The `field` method can define primitive types and objects, like hash/array or any object. For objects, there is no need to declare the datatype.
+```ruby
+class MyService
+  include ServiceCore
+
+  field :first_name, :string
+  field :last_name, :string
+  field :payload # can be object/hash/array
+
+  def perform
+    success_response(message: "Hello, World", data: name)
+  end
+
+  def name
+    "#{first_name} #{last_name}"
+  end
+end
+```
+
+### `set_output` method
+
+The `set_output` method provides a way to set output of a specific key. It is the method used by the response_setters to set specific output value
+```ruby
+class MyService
+  include ServiceCore
+
+  field :first_name, :string
+  field :last_name, :string
+  field :payload # can be object/hash/array
+
+  def perform
+    set_output :message, "Hello, World"
+    set_output :data, name
+  end
+
+  def name
+    "#{first_name} #{last_name}"
+  end
+end
+
+obj = MyService.call(first_name: "John", last_name: "Doe")
+puts obj.output
+# Output:
+# {
+#   status: "success",
+#   message: "Hello, World",
+#.  data: "John Doe"
+# }
+```
+*NOTE:* If `:status` is not explicitly set in the perform method, the `success` status is returned if `errors` are blank else the `error` status is returned.
+
+### Response Setters
+
+#### `success_response`
+Use the `success_response` method to return the `success` status, `data` and `message`
+```ruby
+
+class MyService
+  include ServiceCore
+
+  field :first_name, :string
+  field :last_name, :string
+  field :active, :boolean, default: true
+
+  def perform
+    success_response(message: "Hello, World", data: name)
+  end
+
+  def name
+    "#{first_name} #{last_name}"
+  end
+end
+
+service = MyService.new(first_name: "John", last_name: "Doe")
+result = service.call
 puts result
 # Output:
 # {
@@ -103,6 +169,82 @@ puts result
 #.  data: "John Doe"
 # }
 ```
+
+`success_response` accepts following arguments:
+- message
+- data
+
+#### `error_response`
+Use the `error_response` method to return the `error` status, `errors` and `message`
+```ruby
+
+class MyService
+  include ServiceCore
+
+  field :first_name, :string
+  field :last_name, :string
+  field :active, :boolean, default: true
+
+  def perform
+    error_response(message: "validation failure", errors: "last_name can't be blank")
+  end
+
+  def name
+    "#{first_name} #{last_name}"
+  end
+end
+
+service = MyService.new(first_name: "John")
+result = service.call
+puts result
+# Output:
+# {
+#   status: "error",
+#   message: "validation failure",
+#.  errors: "last_name can't be blank"
+# }
+```
+
+`error_response` accepts following arguments:
+- message
+- errors
+
+#### `formatted_response`
+Use the `formatted_response` method to return any status other than `success` or `error`.
+```ruby
+
+class MyService
+  include ServiceCore
+
+  field :first_name, :string
+  field :last_name, :string
+  field :active, :boolean, default: true
+
+  def perform
+    formatted_response(status: 'processed', message: "Hello, World", data: name)
+  end
+
+  def name
+    "#{first_name} #{last_name}"
+  end
+end
+
+service = MyService.new(first_name: "John", last_name: "Doe")
+result = service.call
+puts result
+# Output:
+# {
+#   status: "processed",
+#   message: "Hello, World",
+#.  data: "John Doe"
+# }
+```
+
+`formatted_response` accepts following arguments:
+- status
+- message
+- data
+- errors
 
 ### Validations
 Define validation on the service and those will be invoked before service logic is invoked.
@@ -152,7 +294,8 @@ class MyService
   end
 end
 
-MyService.call(first_name: 'abc')
+obj = MyService.call(first_name: 'abc')
+obj.output
 # output:
 # {
 #   status: "error",
@@ -198,43 +341,6 @@ ServiceCore.configure do |config|
   config.logger = Logger.new(STDOUT)
 end
 ```
-
-### Custom Response
-Use the `formatted_response` method to return any status other than `success` or `error`.
-```ruby
-
-class MyService
-  include ServiceCore
-
-  field :first_name, :string
-  field :last_name, :string
-  field :active, :boolean, default: true
-
-  def perform
-    formatted_response(status: 'processed', message: "Hello, World", data: name)
-  end
-
-  def name
-    "#{first_name} #{last_name}"
-  end
-end
-
-service = MyService.new(first_name: "John", last_name: "Doe")
-result = service.call
-puts result
-# Output:
-# {
-#   status: "processed",
-#   message: "Hello, World",
-#.  data: "John Doe"
-# }
-```
-
-`formatted_response` accepts following arguments:
-- status
-- message
-- data
-- errors
 
 ## Contributing
 
