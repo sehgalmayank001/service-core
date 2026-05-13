@@ -42,6 +42,23 @@ RSpec.describe ServiceCore::Base do
       expect(service.fields[:name]).to eq("World")
       expect(service.fields[:active]).to be true
     end
+
+    it "exposes fields as a FieldSet value object" do
+      expect(service.fields).to be_a(ServiceCore::FieldSet)
+    end
+
+    it "supports named accessors on fields" do
+      expect(service.fields.name).to eq("World")
+      expect(service.fields.active).to be true
+    end
+
+    it "compares fields equal to its hash form" do
+      expect(service.fields).to eq(name: "World", active: true)
+    end
+
+    it "freezes the underlying snapshot" do
+      expect { service.fields.to_h[:name] = "Other" }.to raise_error(FrozenError)
+    end
   end
 
   describe "#call" do

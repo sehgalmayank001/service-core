@@ -14,11 +14,17 @@ module ServiceCore
       include ActiveModel::Attributes
       include ActiveModel::Validations
 
-      # NOTE: fields attribute will hold the fields defined and their values
+      # NOTE: fields holds a {ServiceCore::FieldSet} snapshot of declared
+      # fields and their values at +#initialize+ time. The FieldSet is
+      # Hash-compatible (responds to +[]+, +==+ with a Hash, +to_h+) so
+      # existing +service.fields[:name]+ callers keep working unchanged,
+      # while gaining named accessors and immutability.
       attr_reader :fields
 
       class << self
-        # Wrapper method to define attribuutes and attr_accessor methods on object
+        # Registry of declared fields, keyed by name. Values are the
+        # declared default for each field (nil when no default was given).
+        # Kept as a Hash for backward-compatible introspection.
         def fields_defined
           @fields_defined ||= {}
         end
@@ -61,11 +67,12 @@ module ServiceCore
       def initialize(attributes = {})
         super
         @local_errors = {}
-        @fields = {}
-        # NOTE: this helps identify values passed from values updated
-        self.class.fields_defined.each_key do |name|
-          @fields[name] = send(name)
-        end
+        # Capture an immutable snapshot of every declared field's value at
+        # initialisation time. Stored as a {ServiceCore::FieldSet} so the
+        # snapshot has a name, is read-only, and exposes both Hash-style
+        # and named access.
+        snapshot = self.class.fields_defined.keys.to_h { |name| [name, send(name)] }
+        @fields = ServiceCore::FieldSet.new(snapshot)
       end
 
       def call
