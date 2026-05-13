@@ -25,11 +25,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.3", "3.4"]
+        ruby: ["3.3", "3.4", "4.0"]
         gemfile:
           - gemfiles/rails_7.2.gemfile
           - gemfiles/rails_8.0.gemfile
           - gemfiles/rails_8.1.gemfile
+        exclude:
+          # Rails 7.2 predates Ruby 4.0 and does not officially support it.
+          - ruby: "4.0"
+            gemfile: gemfiles/rails_7.2.gemfile
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}
     steps:
