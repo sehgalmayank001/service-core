@@ -1,6 +1,6 @@
 require "active_support/concern"
+require "active_model/errors"
 require_relative "output"
-# require "active_model/errors"
 
 module ServiceCore
   module Response

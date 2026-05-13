@@ -1,3 +1,5 @@
+require "active_support/json"
+
 module ServiceCore
   # Immutable, Hash-compatible snapshot of a service's declared fields and
   # their values at +#initialize+ time.
