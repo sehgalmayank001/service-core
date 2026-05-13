@@ -19,8 +19,8 @@ module ServiceCore
       attr_reader :fields
 
       class << self
-        def fields_defined
-          @fields_defined ||= {}
+        def field_names
+          @field_names ||= []
         end
 
         def field(name, *args, **opts)
@@ -39,7 +39,7 @@ module ServiceCore
             attr_accessor(name)
           end
 
-          fields_defined[name] = default
+          field_names << name unless field_names.include?(name)
         end
 
         def call(attributes = {})
@@ -52,7 +52,7 @@ module ServiceCore
       def initialize(attributes = {})
         super
         @local_errors = {}
-        snapshot = self.class.fields_defined.keys.to_h { |name| [name, send(name)] }
+        snapshot = self.class.field_names.to_h { |name| [name, send(name)] }
         @fields = ServiceCore::FieldSet.new(snapshot)
       end
 

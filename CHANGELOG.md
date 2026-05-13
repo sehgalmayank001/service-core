@@ -50,6 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Internal cleanups: `Output#initialize` now calls `super()`, the
   `StepValidation` validator helpers are private, and `auto_assign_status`
   no longer has the redundant elsif clauses.
+- The class-level `fields_defined` registry is renamed to `field_names`
+  and is now an Array of declared field names rather than a Hash mapping
+  names to defaults. The default values were never read (they remain in
+  effect through `ActiveModel::Attributes`); the Hash had degenerated
+  into a Set-of-names with a confusing name and shape.
 
 ### Fixed
 
