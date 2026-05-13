@@ -20,16 +20,21 @@ module ServiceCore
       formatted_response(status: "error", message: message, errors: errors)
     end
 
-    # set output response
+    # Records the response keys on +@output+.
+    #
+    # Each key is only skipped when its value is +nil+, so legitimate
+    # falsy values (+false+, +0+, +""+) are preserved.
     def formatted_response(status:, message: nil, data: nil, errors: nil)
       set_output(:status, status)
-      set_output(:message, message) if message.present?
-      set_output(:data, data) if data.present?
-      set_output(:errors, error_messages(errors)) if errors.present?
+      set_output(:message, message)
+      set_output(:data, data)
+      set_output(:errors, error_messages(errors))
       output
     end
 
     def error_messages(errors)
+      return nil if errors.nil?
+
       errors.is_a?(ActiveModel::Errors) ? errors.messages : errors
     end
   end

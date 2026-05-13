@@ -22,8 +22,12 @@ module ServiceCore
 
     private
 
+    # Records a key on the response.
+    #
+    # Only +nil+ values are short-circuited; legitimate falsy values such
+    # as +false+, +0+ and +""+ are recorded faithfully.
     def set_output(key, value)
-      return unless key && value
+      return if key.nil? || value.nil?
 
       @output[key] = value
       @output_dirty = true
