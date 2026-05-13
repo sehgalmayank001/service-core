@@ -18,10 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   because the value object is Hash-compatible.
 - `service.response` as an alias for `service.output`. `output` is retained
   for backward compatibility.
-- `ServiceCore::FieldSet`: an immutable, Hash-compatible snapshot for
-  `service.fields`. Each declared symbol field is also exposed as a real
-  method (e.g. `service.fields.first_name`), and the underlying hash is
-  frozen.
+- `ServiceCore::FieldSet`: an immutable snapshot for `service.fields`.
+  Each declared symbol field is exposed as a real method (e.g.
+  `service.fields.first_name`); call `to_h` for a plain Hash. The
+  underlying hash is frozen.
 - `field` now accepts positional defaults of any value, including `false`,
   `nil`, `0`, and `""`. The keyword form is unchanged.
 - Cross-Rails test matrix using `appraisal`: Rails 7.2, 8.0 and 8.1.

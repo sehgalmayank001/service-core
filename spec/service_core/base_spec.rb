@@ -52,8 +52,8 @@ RSpec.describe ServiceCore::Base do
       expect(service.fields.active).to be true
     end
 
-    it "compares fields equal to its hash form" do
-      expect(service.fields).to eq(name: "World", active: true)
+    it "exposes the snapshot via to_h" do
+      expect(service.fields.to_h).to eq(name: "World", active: true)
     end
 
     it "freezes the underlying snapshot" do

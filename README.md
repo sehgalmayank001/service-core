@@ -130,15 +130,14 @@ Typed fields are backed by `ActiveModel::Attributes` and inherit its casting and
 
 ### Field snapshot via `FieldSet`
 
-After construction, `service.fields` exposes an immutable snapshot of the declared fields and their values as a `ServiceCore::FieldSet`. As with `Response`, it behaves like a Hash and as a named value object:
+After construction, `service.fields` exposes an immutable snapshot of the declared fields and their values as a `ServiceCore::FieldSet`. Each declared symbol field is available as a real method; call `to_h` if you need a plain Hash.
 
 ```ruby
 service = GreetService.new(first_name: "John", last_name: "Doe")
 
-service.fields[:first_name] # => "John"   (Hash style)
-service.fields.first_name   # => "John"   (named accessor)
-service.fields.to_h         # frozen Hash of all snapshot values
-service.fields == { first_name: "John", last_name: "Doe", active: true } # => true
+service.fields.first_name   # => "John"  (named accessor)
+service.fields[:first_name] # => "John"  (also supported)
+service.fields.to_h         # => { first_name: "John", last_name: "Doe", active: true }
 ```
 
 The snapshot is taken at `#initialize`, so it reflects the values at construction time. Live values are still available through each declared accessor (e.g. `service.first_name`).
