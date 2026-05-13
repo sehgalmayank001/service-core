@@ -9,12 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `ServiceCore::Result`: a Hash-compatible value object that backs `service.output`
-  and the return of `#call`. Adds named accessors (`result.status`, `result.data`,
-  `result.message`, `result.errors`), pattern matching via `deconstruct_keys`,
-  `dig`, `fetch`, `each_pair`, `as_json`/`to_json`, and a `.from` Hash coercer.
-  Existing `result[:status]`, `result == hash`, and `puts result` callers keep
-  working unchanged.
+- `ServiceCore::Response`: a Hash-compatible value object that backs
+  `service.response` / `service.output` and the return of `#call`. Adds named
+  accessors (`response.status`, `response.data`, `response.message`,
+  `response.errors`), pattern matching via `deconstruct_keys`, `dig`, `fetch`,
+  `each_pair`, `as_json`/`to_json`, and a `.from` Hash coercer. Existing
+  `result[:status]`, `result == hash`, and `puts result` callers keep working
+  unchanged because the value object is Hash-compatible.
+- `service.response` as an alias for `service.output`. `output` is retained
+  for backward compatibility.
 - `ServiceCore::FieldSet`: an immutable, Hash-compatible snapshot for
   `service.fields`. Each declared symbol field is also exposed as a real
   method (e.g. `service.fields.first_name`), and the underlying hash is
@@ -27,6 +30,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The mixin that provides `success_response`, `error_response` and
+  `formatted_response` is renamed from `ServiceCore::Response` to
+  `ServiceCore::Responder`. The `Response` name now refers to the value
+  object; the `Responder` mixin is the builder. Both modules are internal
+  implementation details consumed via `include ServiceCore`, so users
+  who only ever `include ServiceCore` are unaffected. Anyone including
+  `ServiceCore::Response` directly must switch to
+  `include ServiceCore::Responder`.
 - Gemspec: `required_ruby_version` raised to `>= 3.1.0` (Ruby 2.7 and 3.0 are EOL).
 - Gemspec: ActiveModel / ActiveSupport range widened to `>= 6.1, < 9.0`.
 - RuboCop bumped to `~> 1.86` with `rubocop-rake` added as a plugin.

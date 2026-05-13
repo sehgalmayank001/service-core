@@ -1,16 +1,19 @@
 require "active_support/concern"
-require_relative "result"
+require_relative "response"
 
 module ServiceCore
   module Output
     extend ActiveSupport::Concern
 
-    ALLOWED_KEYS = ServiceCore::Result::ALLOWED_KEYS
+    ALLOWED_KEYS = ServiceCore::Response::ALLOWED_KEYS
 
-    # NOTE: output attribute holds the {ServiceCore::Result} for the service.
-    # Result is Hash-compatible (responds to +[]+, +==+ with a Hash, +to_s+),
-    # so existing callers keep working without changes.
+    # NOTE: output holds the {ServiceCore::Response} for the service.
+    # Response is Hash-compatible (responds to +[]+, +==+ with a Hash,
+    # +to_s+), so existing callers keep working without changes.
     attr_reader :output
+    # response is a more accurately-named accessor for the same value;
+    # output is retained for backward compatibility.
+    alias response output
 
     def initialize(_attributes = {})
       # Empty parens so that mixing Output in beside other modules that take
@@ -19,7 +22,7 @@ module ServiceCore
       super()
       @output_dirty = false
       @status_dirty = false
-      @output = ServiceCore::Result.new
+      @output = ServiceCore::Response.new
     end
 
     private

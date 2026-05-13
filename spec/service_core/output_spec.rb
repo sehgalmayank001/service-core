@@ -80,8 +80,12 @@ RSpec.describe ServiceCore::Output do
   end
 
   describe "#output" do
-    it "returns a ServiceCore::Result instance" do
-      expect(service.output).to be_a(ServiceCore::Result)
+    it "returns a ServiceCore::Response instance" do
+      expect(service.output).to be_a(ServiceCore::Response)
+    end
+
+    it "is also reachable via #response" do
+      expect(service.response).to equal(service.output)
     end
   end
 

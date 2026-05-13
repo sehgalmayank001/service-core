@@ -1,5 +1,5 @@
 require_relative "service_core/version"
-require_relative "service_core/result"
+require_relative "service_core/response"
 require_relative "service_core/field_set"
 require_relative "service_core/base"
 require_relative "service_core/step_validation"

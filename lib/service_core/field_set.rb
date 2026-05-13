@@ -5,7 +5,7 @@ module ServiceCore
   # their values at +#initialize+ time.
   #
   # Replaces what used to be a raw +Hash+ stored at +@fields+. The
-  # motivation is the same as for {ServiceCore::Result}: a named value
+  # motivation is the same as for {ServiceCore::Response}: a named value
   # object instead of a primitive +Hash+, so that callers cannot mutate
   # the snapshot, type identity is explicit, and each declared field is
   # available as a real method (handy for introspection and IRB).

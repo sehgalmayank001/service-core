@@ -5,7 +5,7 @@ ServiceCore is a small Ruby gem that gives service objects a shared shape. Every
 - Four-key response contract: **status**, **data**, **message**, **errors**.
 - Field declarations with types, defaults, and ActiveModel validations.
 - Step-by-step validation that survives `valid?` calls.
-- Hash-compatible value objects (`Result`, `FieldSet`) instead of raw hashes.
+- Hash-compatible value objects (`Response`, `FieldSet`) instead of raw hashes.
 - Works on Ruby >= 3.1 and Rails (ActiveModel/ActiveSupport) 6.1 through 8.x.
 
 ## Installation
@@ -68,43 +68,48 @@ end
 You can call a service either via `new(...).call` or via the `.call` shortcut on the class:
 
 ```ruby
-result = GreetService.new(first_name: "John", last_name: "Doe").call
-puts result
+response = GreetService.new(first_name: "John", last_name: "Doe").call
+puts response
 # => {status: "success", message: "Hello, World", data: "John Doe"}
 
 service = GreetService.call(first_name: "John", last_name: "Doe")
-service.output
+service.response
 # => {status: "success", message: "Hello, World", data: "John Doe"}
 ```
 
-The instance method returns the response value object. The class-level `.call` returns the service instance, so you can also reach for `service.output` after the fact.
+The instance method returns the response value object. The class-level `.call` returns the service instance, so you can also reach for `service.response` (or `service.output`, which is kept as an alias) after the fact.
 
-## `Result`: the response value object
+## `Response`: the value object
 
-`service.output` (and the value returned from `#call`) is a `ServiceCore::Result`. It looks and feels like a Hash so existing callers continue to work, while also exposing named accessors and immutability of contract:
+`service.response` (alias `service.output`, and the value returned from `#call`) is a `ServiceCore::Response`. It looks and feels like a Hash so existing callers continue to work, while also exposing named accessors:
 
 ```ruby
-result = GreetService.call(first_name: "John", last_name: "Doe").output
+response = GreetService.call(first_name: "John", last_name: "Doe").response
 
 # Named access
-result.status   # => "success"
-result.data     # => "John Doe"
+response.status   # => "success"
+response.data     # => "John Doe"
 
 # Hash-style access (backward compatible)
-result[:status] # => "success"
+response[:status] # => "success"
 
 # Equality with a Hash
-result == { status: "success", message: "Hello, World", data: "John Doe" } # => true
+response == { status: "success", message: "Hello, World", data: "John Doe" } # => true
 
 # JSON / pattern matching
-result.to_json
-case result
+response.to_json
+case response
 in { status: "success", data: }
   data
 end
 ```
 
 Only the four allowed keys are accepted; anything else raises `ArgumentError`.
+
+ServiceCore distinguishes the *value* from the *builder*:
+
+- `ServiceCore::Response` is the value object — what a service emits.
+- `ServiceCore::Responder` is the mixin that gives a service the `success_response`, `error_response` and `formatted_response` helpers used inside `perform`. You include it transitively via `include ServiceCore`.
 
 ## Declaring fields
 
@@ -125,7 +130,7 @@ Typed fields are backed by `ActiveModel::Attributes` and inherit its casting and
 
 ### Field snapshot via `FieldSet`
 
-After construction, `service.fields` exposes an immutable snapshot of the declared fields and their values as a `ServiceCore::FieldSet`. As with `Result`, it behaves like a Hash and as a named value object:
+After construction, `service.fields` exposes an immutable snapshot of the declared fields and their values as a `ServiceCore::FieldSet`. As with `Response`, it behaves like a Hash and as a named value object:
 
 ```ruby
 service = GreetService.new(first_name: "John", last_name: "Doe")

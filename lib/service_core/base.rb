@@ -1,15 +1,15 @@
 require "active_support/concern"
 require "active_model"
-require_relative "response"
+require_relative "responder"
 
 module ServiceCore
   module Base
     extend ActiveSupport::Concern
 
     included do
-      # ServiceCore::Response is included first as it inherited output,
-      # which too has initialize method.
-      include ServiceCore::Response
+      # Responder is included first so its initialize (inherited from
+      # Output) runs at the bottom of the super chain.
+      include ServiceCore::Responder
       include ActiveModel::Model
       include ActiveModel::Attributes
       include ActiveModel::Validations
