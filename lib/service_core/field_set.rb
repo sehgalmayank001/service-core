@@ -3,23 +3,7 @@ require "active_support/json"
 module ServiceCore
   # Immutable, Hash-compatible snapshot of a service's declared fields and
   # their values at +#initialize+ time.
-  #
-  # Replaces what used to be a raw +Hash+ stored at +@fields+. The
-  # motivation is the same as for {ServiceCore::Response}: a named value
-  # object instead of a primitive +Hash+, so that callers cannot mutate
-  # the snapshot, type identity is explicit, and each declared field is
-  # available as a real method (handy for introspection and IRB).
-  #
-  # @example Hash-style access (backward compatible)
-  #   service.fields[:first_name] # => "Ada"
-  #
-  # @example Named access
-  #   service.fields.first_name   # => "Ada"
-  #
-  # @example Equality with a Hash
-  #   service.fields == { first_name: "Ada", last_name: "Lovelace" } # => true
   class FieldSet
-    # @return [Hash{Symbol => Object}] a frozen copy of the snapshot
     attr_reader :to_h
     alias to_hash to_h
 
@@ -87,7 +71,7 @@ module ServiceCore
       @to_h.hash
     end
 
-    # Enables pattern matching: +case fields in { first_name: }+
+    # NOTE: enables pattern matching, e.g. `case fields in { first_name: }`
     def deconstruct_keys(keys)
       keys ? @to_h.slice(*keys) : @to_h
     end

@@ -186,28 +186,4 @@ RSpec.describe ServiceCore::Response do
       expect(result.to_json).to eq({ status: "success", data: { id: 1 } }.to_json)
     end
   end
-
-  describe ".from" do
-    it "coerces a Hash, dropping unknown keys" do
-      result = described_class.from(status: "success", data: { id: 1 }, ignored: true)
-      expect(result.status).to eq("success")
-      expect(result.data).to eq(id: 1)
-    end
-
-    it "tolerates string keys" do
-      result = described_class.from("status" => "success")
-      expect(result.status).to eq("success")
-    end
-
-    it "returns a dup of an existing Response" do
-      original = described_class.new(status: "success")
-      copy = described_class.from(original)
-      expect(copy).to eq(original)
-      expect(copy).not_to equal(original)
-    end
-
-    it "raises ArgumentError for other types" do
-      expect { described_class.from(123) }.to raise_error(ArgumentError, /Cannot coerce/)
-    end
-  end
 end

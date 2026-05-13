@@ -7,45 +7,30 @@ module ServiceCore
     extend ActiveSupport::Concern
 
     included do
-      # Responder is included first so its initialize (inherited from
-      # Output) runs at the bottom of the super chain.
+      # NOTE: Responder is included first so its initialize (inherited
+      # from Output) runs at the bottom of the super chain.
       include ServiceCore::Responder
       include ActiveModel::Model
       include ActiveModel::Attributes
       include ActiveModel::Validations
 
-      # NOTE: fields holds a {ServiceCore::FieldSet} snapshot of declared
-      # fields and their values at +#initialize+ time. The FieldSet is
-      # Hash-compatible (responds to +[]+, +==+ with a Hash, +to_h+) so
-      # existing +service.fields[:name]+ callers keep working unchanged,
-      # while gaining named accessors and immutability.
+      # NOTE: fields holds a ServiceCore::FieldSet snapshot of declared
+      # fields and their values at initialize time.
       attr_reader :fields
 
       class << self
-        # Registry of declared fields, keyed by name. Values are the
-        # declared default for each field (nil when no default was given).
-        # Kept as a Hash for backward-compatible introspection.
         def fields_defined
           @fields_defined ||= {}
         end
 
-        # Declares a field on the service.
-        #
-        # Supports both keyword and positional forms:
-        #
-        #   field :active, :boolean, default: true
-        #   field :active, type: :boolean, default: true
-        #   field :active, :boolean, false        # positional default
-        #   field :payload                         # untyped (hash/array/object)
-        #
-        # Typed fields are backed by ActiveModel::Attributes and inherit its
-        # casting and default support. Untyped fields fall back to a plain
-        # attr_accessor and cannot carry defaults.
         def field(name, *args, **opts)
+          # field :active, :boolean, default: true
+          # field :active, type: :boolean, default: true
+          # field :active, :boolean, false   # positional default
+          # field :payload                   # untyped (hash/array/object)
           type = args.first || opts[:type]
-          # NOTE: arity check is required so that positional defaults of
-          # false or nil are honoured; `args[1] || opts[:default]` would
-          # silently swallow `false`.
+          # NOTE: arity check, not `||`, so a positional default of
+          # `false` or `nil` is not silently swallowed by opts[:default].
           default = args.length >= 2 ? args[1] : opts[:default]
 
           if type
@@ -67,10 +52,6 @@ module ServiceCore
       def initialize(attributes = {})
         super
         @local_errors = {}
-        # Capture an immutable snapshot of every declared field's value at
-        # initialisation time. Stored as a {ServiceCore::FieldSet} so the
-        # snapshot has a name, is read-only, and exposes both Hash-style
-        # and named access.
         snapshot = self.class.fields_defined.keys.to_h { |name| [name, send(name)] }
         @fields = ServiceCore::FieldSet.new(snapshot)
       end

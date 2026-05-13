@@ -13,9 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `service.response` / `service.output` and the return of `#call`. Adds named
   accessors (`response.status`, `response.data`, `response.message`,
   `response.errors`), pattern matching via `deconstruct_keys`, `dig`, `fetch`,
-  `each_pair`, `as_json`/`to_json`, and a `.from` Hash coercer. Existing
-  `result[:status]`, `result == hash`, and `puts result` callers keep working
-  unchanged because the value object is Hash-compatible.
+  `each_pair`, and `as_json`/`to_json`. Existing `result[:status]`,
+  `result == hash`, and `puts result` callers keep working unchanged
+  because the value object is Hash-compatible.
 - `service.response` as an alias for `service.output`. `output` is retained
   for backward compatibility.
 - `ServiceCore::FieldSet`: an immutable, Hash-compatible snapshot for

@@ -3,12 +3,7 @@ require "active_model/errors"
 require_relative "output"
 
 module ServiceCore
-  # Mixin that gives a service the ergonomic helpers used inside +perform+
-  # to assemble a {ServiceCore::Response}: +success_response+,
-  # +error_response+ and +formatted_response+.
-  #
-  # A class that includes +Responder+ becomes capable of responding; the
-  # value it emits is a {ServiceCore::Response}.
+  # Mixin that provides the response-building helpers used inside +perform+.
   module Responder
     extend ActiveSupport::Concern
 
@@ -24,10 +19,8 @@ module ServiceCore
       formatted_response(status: "error", message: message, errors: errors)
     end
 
-    # Records the response keys on +@output+.
-    #
-    # Each key is only skipped when its value is +nil+, so legitimate
-    # falsy values (+false+, +0+, +""+) are preserved.
+    # NOTE: nil-valued keys are skipped; legitimate falsy values
+    # (false, 0, "") are recorded faithfully.
     def formatted_response(status:, message: nil, data: nil, errors: nil)
       set_output(:status, status)
       set_output(:message, message)

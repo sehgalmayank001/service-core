@@ -7,18 +7,14 @@ module ServiceCore
 
     ALLOWED_KEYS = ServiceCore::Response::ALLOWED_KEYS
 
-    # NOTE: output holds the {ServiceCore::Response} for the service.
-    # Response is Hash-compatible (responds to +[]+, +==+ with a Hash,
-    # +to_s+), so existing callers keep working without changes.
+    # NOTE: output holds the ServiceCore::Response for the service.
+    # response is the preferred name; output is retained as an alias.
     attr_reader :output
-    # response is a more accurately-named accessor for the same value;
-    # output is retained for backward compatibility.
     alias response output
 
     def initialize(_attributes = {})
-      # Empty parens so that mixing Output in beside other modules that take
-      # keyword arguments (e.g. ActiveModel::Model) does not forward stray
-      # positional args up the chain.
+      # NOTE: super() with empty parens so positional args aren't forwarded
+      # up to other modules in the ancestor chain (ActiveModel::Model et al).
       super()
       @output_dirty = false
       @status_dirty = false
@@ -27,10 +23,8 @@ module ServiceCore
 
     private
 
-    # Records a key on the response.
-    #
-    # Only +nil+ values are short-circuited; legitimate falsy values such
-    # as +false+, +0+ and +""+ are recorded faithfully.
+    # NOTE: nil values are skipped; legitimate falsy values
+    # (false, 0, "") are recorded faithfully.
     def set_output(key, value)
       return if key.nil? || value.nil?
 
