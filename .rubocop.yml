@@ -1,9 +1,14 @@
 require:
+  - rubocop-rake
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.1
   NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - "gemfiles/**/*"
+    - "vendor/**/*"
 
 Style/StringLiterals:
   Enabled: true
@@ -33,3 +38,9 @@ RSpec/MessageSpies:
 
 RSpec/VerifiedDoubleReference:
   Enabled: false
+
+# add_error_and_validate is part of the public API and intentionally returns
+# the boolean result of valid?, but its name describes the action it performs.
+Naming/PredicateMethod:
+  AllowedMethods:
+    - add_error_and_validate

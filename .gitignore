@@ -11,3 +11,10 @@
 .rspec_status
 
 *.gem
+
+# Appraisal lockfiles are regenerated per Ruby/Rails combination.
+gemfiles/*.gemfile.lock
+gemfiles/.bundle/
+
+# asdf/rbenv local Ruby pin
+!.tool-versions
