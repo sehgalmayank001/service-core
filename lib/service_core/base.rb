@@ -25,26 +25,31 @@ module ServiceCore
           @fields_defined ||= {}
         end
 
+        # Declares a field on the service.
+        #
+        # Supports both keyword and positional forms:
+        #
+        #   field :active, :boolean, default: true
+        #   field :active, type: :boolean, default: true
+        #   field :active, :boolean, false        # positional default
+        #   field :payload                         # untyped (hash/array/object)
+        #
+        # Typed fields are backed by ActiveModel::Attributes and inherit its
+        # casting and default support. Untyped fields fall back to a plain
+        # attr_accessor and cannot carry defaults.
         def field(name, *args, **opts)
-          # field :active, :boolean, default: true
-          # field :active, type: :boolean, default: true
-          # Both explicit and implicit definitions are handled
-          type = args[0] || opts[:type]
-          default = args[1] || opts[:default]
+          type = args.first || opts[:type]
+          # NOTE: arity check is required so that positional defaults of
+          # false or nil are honoured; `args[1] || opts[:default]` would
+          # silently swallow `false`.
+          default = args.length >= 2 ? args[1] : opts[:default]
 
-          # NOTE: -
-          # ActiveModel::Attributes support only basic data types
-          # for ActiveRecord objects we use attr_accessor through ActiveModel::Model
-          # define attr_accessor to make instance variables also available for attributes
-
-          # define attribute if type is available to type cast
           if type
             attribute(name, type, default: default)
           else
             attr_accessor(name)
           end
 
-          # save fields defind as an hash, makes it easier to check
           fields_defined[name] = default
         end
 
