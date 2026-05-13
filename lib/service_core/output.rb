@@ -15,6 +15,10 @@ module ServiceCore
     attr_reader :output
 
     def initialize(_attributes = {})
+      # Empty parens so that mixing Output in beside other modules that take
+      # keyword arguments (e.g. ActiveModel::Model) does not forward stray
+      # positional args up the chain.
+      super()
       @output_dirty = false
       @status_dirty = false
       @output = ServiceCore::Result.new

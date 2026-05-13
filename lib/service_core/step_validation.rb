@@ -3,43 +3,52 @@
 require "active_support/concern"
 
 module ServiceCore
+  # Allows a service to accumulate validation errors mid-+perform+ without
+  # being wiped by subsequent +valid?+ calls. ActiveModel::Validations
+  # resets +errors+ on every +valid?+, which is hostile to multi-step
+  # services; this module re-applies any errors recorded via {#add_error}
+  # through a registered validator.
   module StepValidation
     extend ActiveSupport::Concern
 
     included do
-      # NOTE: #
-      # added this to support partial validation
-      # valid? method empties all errors, so needed a way to hold errors from within method invocation
       validate :local_errors_validation
+    end
 
-      def local_errors_validation
-        _local_errors_validation(@local_errors)
+    # Records an error to be re-applied to +errors+ on the next +valid?+
+    # call. Multiple errors per attribute are supported.
+    #
+    # @param attribute [Symbol]
+    # @param message [String, Symbol]
+    # @param options [Hash] forwarded to +ActiveModel::Errors#add+
+    def add_error(attribute, message, options = {})
+      value = options.empty? ? message : [message, options]
+      @local_errors[attribute] ||= []
+      @local_errors[attribute] << value
+    end
+
+    # Adds an error and immediately validates, mirroring the common
+    # +invalid? unless ...+ idiom.
+    #
+    # @return [Boolean] result of +valid?+
+    def add_error_and_validate(attribute, message, options = {})
+      add_error(attribute, message, options)
+      valid?
+    end
+
+    private
+
+    def local_errors_validation
+      @local_errors.each do |attribute, messages|
+        Array(messages).each { |message| apply_local_error(attribute, message) }
       end
+    end
 
-      def _local_errors_validation(errors_hsh)
-        errors_hsh.each do |attribute, messages|
-          next unless messages
-
-          messages.each do |message|
-            errors.add(attribute, *message.is_a?(Array) ? message : [message])
-          end
-        end
-        {}
-      end
-
-      def add_error(attribute, message, options = {})
-        value = options.present? ? [message, options] : message
-        @local_errors[attribute] = if @local_errors[attribute].present?
-                                     Array(@local_errors[attribute]) << value
-                                   else
-                                     [value]
-                                   end
-      end
-
-      # method to add partial errors and validate
-      def add_error_and_validate(attribute, message, _options = {})
-        add_error(attribute, message, {})
-        valid?
+    def apply_local_error(attribute, message)
+      if message.is_a?(Array)
+        errors.add(attribute, *message)
+      else
+        errors.add(attribute, message)
       end
     end
   end
