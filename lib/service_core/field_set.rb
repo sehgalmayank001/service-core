@@ -1,7 +1,7 @@
 module ServiceCore
   # Immutable snapshot of a service's declared fields and their values
-  # at #initialize time. Each symbol key is exposed as a real method.
-  # Call #to_h for full Hash semantics.
+  # at #initialize time. Each symbol key is exposed as a real method;
+  # call #to_h for the raw snapshot Hash.
   class FieldSet
     attr_reader :to_h
 
@@ -12,10 +12,6 @@ module ServiceCore
 
         define_singleton_method(name) { @to_h[name] }
       end
-    end
-
-    def [](name)
-      @to_h[name]
     end
 
     def inspect

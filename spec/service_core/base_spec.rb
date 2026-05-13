@@ -9,7 +9,7 @@ class TestService
   field :active, :boolean, default: true
 
   def perform
-    @output[:message] = "Hello, #{@fields[:name]}"
+    @output[:message] = "Hello, #{name}"
   end
 end
 
@@ -38,16 +38,11 @@ RSpec.describe ServiceCore::Base do
   let(:service) { TestService.new(name: "World") }
 
   describe "#initialize" do
-    it "initializes with the given attributes" do
-      expect(service.fields[:name]).to eq("World")
-      expect(service.fields[:active]).to be true
-    end
-
     it "exposes fields as a FieldSet value object" do
       expect(service.fields).to be_a(ServiceCore::FieldSet)
     end
 
-    it "supports named accessors on fields" do
+    it "snapshots declared fields via named accessors" do
       expect(service.fields.name).to eq("World")
       expect(service.fields.active).to be true
     end
@@ -87,7 +82,7 @@ RSpec.describe ServiceCore::Base do
 
     it "honours a positional false default" do
       expect(service.enabled_positional).to be false
-      expect(service.fields[:enabled_positional]).to be false
+      expect(service.fields.enabled_positional).to be false
     end
 
     it "honours a keyword false default" do

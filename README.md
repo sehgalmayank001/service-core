@@ -135,8 +135,7 @@ After construction, `service.fields` exposes an immutable snapshot of the declar
 ```ruby
 service = GreetService.new(first_name: "John", last_name: "Doe")
 
-service.fields.first_name   # => "John"  (named accessor)
-service.fields[:first_name] # => "John"  (also supported)
+service.fields.first_name   # => "John"
 service.fields.to_h         # => { first_name: "John", last_name: "Doe", active: true }
 ```
 
