@@ -1,3 +1,5 @@
+require "active_support/json"
+
 module ServiceCore
   # Value object representing a service response.
   #

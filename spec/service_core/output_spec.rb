@@ -38,10 +38,50 @@ RSpec.describe ServiceCore::Output do
     context "when key is invalid" do
       it "raises an ArgumentError" do
         expect do
-          service.set_test_output(:invalid_key,
-                                  "value")
+          service.set_test_output(:invalid_key, "value")
         end.to raise_error(ArgumentError, "Invalid key. Allowed keys are: status, data, message, errors")
       end
+    end
+
+    context "with legitimate falsy values" do
+      it "records false" do
+        service.set_test_output(:data, false)
+        expect(service.output[:data]).to be false
+      end
+
+      it "records 0" do
+        service.set_test_output(:data, 0)
+        expect(service.output[:data]).to eq(0)
+      end
+
+      it "records an empty string" do
+        service.set_test_output(:message, "")
+        expect(service.output[:message]).to eq("")
+      end
+
+      it "records an empty hash" do
+        service.set_test_output(:errors, {})
+        expect(service.output[:errors]).to eq({})
+      end
+    end
+
+    context "when value is nil" do
+      it "silently skips the write" do
+        service.set_test_output(:data, nil)
+        expect(service.output.key?(:data)).to be false
+      end
+    end
+
+    context "when key is nil" do
+      it "silently skips the write" do
+        expect { service.set_test_output(nil, "value") }.not_to raise_error
+      end
+    end
+  end
+
+  describe "#output" do
+    it "returns a ServiceCore::Result instance" do
+      expect(service.output).to be_a(ServiceCore::Result)
     end
   end
 

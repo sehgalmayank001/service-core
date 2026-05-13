@@ -33,10 +33,6 @@ RSpec.describe ServiceCore::Response do
   end
 
   describe "#formatted_response" do
-    before do
-      service.instance_variable_set(:@output, {})
-    end
-
     context "when all arguments are provided" do
       it "sets the output with all provided values" do
         status = "success"
@@ -90,6 +86,49 @@ RSpec.describe ServiceCore::Response do
         expect(result[:status]).to eq(status)
         expect(result[:errors]).to eq(errors)
       end
+    end
+
+    context "with legitimate falsy values" do
+      it "records data: false" do
+        result = service.send(:formatted_response, status: "success", data: false)
+        expect(result[:data]).to be false
+      end
+
+      it "records message as an empty string" do
+        result = service.send(:formatted_response, status: "success", message: "")
+        expect(result[:message]).to eq("")
+      end
+
+      it "records data: 0" do
+        result = service.send(:formatted_response, status: "success", data: 0)
+        expect(result[:data]).to eq(0)
+      end
+    end
+  end
+
+  describe "#error_messages" do
+    it "returns nil when errors are nil" do
+      expect(service.send(:error_messages, nil)).to be_nil
+    end
+
+    it "extracts messages from ActiveModel::Errors" do
+      model_class = Class.new do
+        include ActiveModel::Model
+
+        attr_accessor :name
+
+        validates :name, presence: true
+      end
+      stub_const("ErrorMessagesFixture", model_class)
+
+      model = model_class.new
+      model.valid?
+      expect(service.send(:error_messages, model.errors)).to eq(name: ["can't be blank"])
+    end
+
+    it "passes through plain values unchanged" do
+      payload = { field: ["bad"] }
+      expect(service.send(:error_messages, payload)).to eq(payload)
     end
   end
 end
