@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative "service_core/version"
 require_relative "service_core/result"
 require_relative "service_core/base"

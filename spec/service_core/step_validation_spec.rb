@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # spec/service_core/step_validations_spec.rb
 
 require "spec_helper"

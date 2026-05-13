@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative "lib/service_core/version"
 
 Gem::Specification.new do |spec|

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module ServiceCore
   # Value object representing a service response.
   #

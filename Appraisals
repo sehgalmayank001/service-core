@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # Each appraisal pins ActiveModel/ActiveSupport to a maintained Rails release.
 # Older Rails versions (6.1, 7.0, 7.1) are still permitted by the gemspec
 # floor but are not exercised here because their upstream support window

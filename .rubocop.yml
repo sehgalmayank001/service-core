@@ -16,6 +16,10 @@ Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
 
+# Per project style, frozen_string_literal magic comments are not used.
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
 Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
