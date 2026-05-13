@@ -1,5 +1,6 @@
 require "active_support/concern"
 require "active_model"
+require "set"
 require_relative "responder"
 
 module ServiceCore
@@ -20,7 +21,7 @@ module ServiceCore
 
       class << self
         def field_names
-          @field_names ||= []
+          @field_names ||= Set.new
         end
 
         def field(name, *args, **opts)
@@ -39,7 +40,7 @@ module ServiceCore
             attr_accessor(name)
           end
 
-          field_names << name unless field_names.include?(name)
+          field_names.add(name)
         end
 
         def call(attributes = {})
