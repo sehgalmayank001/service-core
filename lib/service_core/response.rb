@@ -103,7 +103,7 @@ module ServiceCore
     def ensure_allowed_key!(key)
       return if ALLOWED_KEYS.include?(key)
 
-      raise(ArgumentError, "Invalid key. Allowed keys are: #{ALLOWED_KEYS.join(", ")}")
+      raise(ServiceCore::InvalidKey, "Invalid key. Allowed keys are: #{ALLOWED_KEYS.join(", ")}")
     end
   end
 end

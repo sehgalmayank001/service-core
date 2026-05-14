@@ -31,15 +31,15 @@ RSpec.describe ServiceCore::Response do
       expect(result.data).to eq(id: 1)
     end
 
-    it "raises ArgumentError for invalid read keys" do
+    it "raises ServiceCore::InvalidKey for invalid read keys" do
       expect { result[:invalid] }.to raise_error(
-        ArgumentError, "Invalid key. Allowed keys are: status, data, message, errors"
+        ServiceCore::InvalidKey, "Invalid key. Allowed keys are: status, data, message, errors"
       )
     end
 
-    it "raises ArgumentError for invalid write keys" do
+    it "raises ServiceCore::InvalidKey for invalid write keys" do
       expect { result[:invalid] = "x" }.to raise_error(
-        ArgumentError, "Invalid key. Allowed keys are: status, data, message, errors"
+        ServiceCore::InvalidKey, "Invalid key. Allowed keys are: status, data, message, errors"
       )
     end
   end

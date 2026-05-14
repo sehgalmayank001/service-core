@@ -267,6 +267,25 @@ class MyService
 end
 ```
 
+## Exceptions
+
+All gem-specific exceptions inherit from `ServiceCore::Error`, so a single rescue block can catch anything ServiceCore raises:
+
+```ruby
+begin
+  MyService.call(...)
+rescue ServiceCore::Error => e
+  # any gem-raised error
+end
+```
+
+The current concrete subclasses are:
+
+- `ServiceCore::InvalidKey` — raised by `response[:not_allowed]` or `response[:not_allowed] = value` when the key is not one of the four allowed response keys.
+- `ServiceCore::ReservedFieldName` — raised by `field :errors` (or any other reserved name) at class-definition time.
+
+`Response#fetch` continues to raise `KeyError` and the default `perform` continues to raise a plain `StandardError` for Hash and ActiveModel parity respectively.
+
 ## Configuration
 
 ```ruby

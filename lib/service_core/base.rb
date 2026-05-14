@@ -57,7 +57,10 @@ module ServiceCore
         def ensure_field_name_available!(name)
           return unless ServiceCore::Base::RESERVED_FIELD_NAMES.include?(name)
 
-          raise(ArgumentError, "`#{name}` is reserved by ServiceCore and cannot be used as a field name")
+          raise(
+            ServiceCore::ReservedFieldName,
+            "`#{name}` is reserved by ServiceCore and cannot be used as a field name"
+          )
         end
       end
 

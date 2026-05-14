@@ -1,4 +1,5 @@
 require_relative "service_core/version"
+require_relative "service_core/errors"
 require_relative "service_core/response"
 require_relative "service_core/field_set"
 require_relative "service_core/base"
@@ -16,8 +17,6 @@ module ServiceCore
     include ServiceCore::StepValidation
     include ServiceCore::Logger
   end
-
-  class Error < StandardError; end
 
   class << self
     attr_writer :logger

@@ -36,10 +36,10 @@ RSpec.describe ServiceCore::Output do
     end
 
     context "when key is invalid" do
-      it "raises an ArgumentError" do
+      it "raises ServiceCore::InvalidKey" do
         expect do
           service.set_test_output(:invalid_key, "value")
-        end.to raise_error(ArgumentError, "Invalid key. Allowed keys are: status, data, message, errors")
+        end.to raise_error(ServiceCore::InvalidKey, "Invalid key. Allowed keys are: status, data, message, errors")
       end
     end
 

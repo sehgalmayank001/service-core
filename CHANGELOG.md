@@ -32,6 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cross-Rails test matrix using `appraisal`: Rails 7.2, 8.0 and 8.1.
 - CI matrix expanded to Ruby 3.3, 3.4 and 4.0 (excluding Ruby 4.0 + Rails 7.2).
 - This `CHANGELOG.md` is now structured per Keep a Changelog.
+- Gem-specific exception hierarchy under `ServiceCore::Error`. Concrete
+  subclasses: `ServiceCore::InvalidKey` (raised by `Response#[]` / `[]=`
+  on a non-allowed key) and `ServiceCore::ReservedFieldName` (raised by
+  `field` when a reserved name is declared). `ServiceCore::Error`
+  itself existed since 0.1.0 but was never raised. Callers can now
+  `rescue ServiceCore::Error => e` to catch any gem-raised error.
 
 ### Changed
 
