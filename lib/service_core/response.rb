@@ -4,6 +4,8 @@ module ServiceCore
   # Value object carrying the four-key service response.
   class Response
     ALLOWED_KEYS = %i[status data message errors].freeze
+    FETCH_DEFAULT_OMITTED = Object.new.freeze
+    private_constant :FETCH_DEFAULT_OMITTED
 
     attr_accessor(*ALLOWED_KEYS)
 
@@ -14,6 +16,8 @@ module ServiceCore
       @errors = errors
     end
 
+    # NOTE: writes police the four-key contract; reads (fetch, dig)
+    # follow Hash semantics so callers can treat Response like a Hash.
     def [](key)
       ensure_allowed_key!(key)
       public_send(key)
@@ -24,12 +28,10 @@ module ServiceCore
       public_send(:"#{key}=", value)
     end
 
-    def fetch(key, *default)
-      ensure_allowed_key!(key)
-      value = public_send(key)
-      return value unless value.nil?
-      return yield(key) if block_given?
-      return default.first if default.any?
+    def fetch(key, default = FETCH_DEFAULT_OMITTED, &block)
+      return public_send(key) if key?(key)
+      return block.call(key) if block
+      return default unless default.equal?(FETCH_DEFAULT_OMITTED)
 
       raise(KeyError, "key not found: #{key.inspect}")
     end
@@ -86,7 +88,8 @@ module ServiceCore
     end
 
     def dig(key, *rest)
-      ensure_allowed_key!(key)
+      return nil unless ALLOWED_KEYS.include?(key)
+
       value = public_send(key)
       return value if rest.empty? || value.nil?
 

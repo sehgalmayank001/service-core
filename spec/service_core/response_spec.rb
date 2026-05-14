@@ -63,8 +63,12 @@ RSpec.describe ServiceCore::Response do
       expect { result.fetch(:message) }.to raise_error(KeyError, /message/)
     end
 
-    it "raises ArgumentError for invalid keys" do
-      expect { result.fetch(:invalid) }.to raise_error(ArgumentError)
+    it "raises KeyError for unknown keys (matching Hash#fetch)" do
+      expect { result.fetch(:invalid) }.to raise_error(KeyError)
+    end
+
+    it "uses the provided default for unknown keys" do
+      expect(result.fetch(:invalid, "fallback")).to eq("fallback")
     end
   end
 
@@ -156,8 +160,8 @@ RSpec.describe ServiceCore::Response do
       expect(result.dig(:data, :user, :missing)).to be_nil
     end
 
-    it "raises ArgumentError on an invalid root key" do
-      expect { result.dig(:invalid, :anything) }.to raise_error(ArgumentError)
+    it "returns nil for an unknown root key (matching Hash#dig)" do
+      expect(result.dig(:invalid, :anything)).to be_nil
     end
   end
 

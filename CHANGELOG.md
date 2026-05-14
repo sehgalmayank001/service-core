@@ -82,6 +82,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `response.rb` and `field_set.rb` now explicitly require the
   ActiveModel/ActiveSupport pieces they depend on, instead of relying on
   transitive autoloading from elsewhere in the gem.
+- `Response#dig` returns `nil` for unknown root keys (matching `Hash#dig`)
+  instead of raising `ArgumentError`. `Response#fetch` raises `KeyError`
+  for unknown keys (matching `Hash#fetch`) instead of `ArgumentError`,
+  and now uses a sentinel default so passing extra positional arguments
+  raises like `Hash#fetch` does. Writes (`[]`, `[]=`) still police the
+  four-key contract.
 
 ## [0.1.0] - 2024-07-17
 
