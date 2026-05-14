@@ -1,4 +1,20 @@
+# TODO: signatures for ServiceCore::Response, ServiceCore::FieldSet,
+# ServiceCore::Base, ServiceCore::Responder, ServiceCore::Output,
+# ServiceCore::StepValidation and ServiceCore::Logger are not yet
+# written. The signatures below cover only the module-level constants
+# and configuration helpers so the file is honest about what is
+# actually typed.
+# See the writing guide of rbs: https://github.com/ruby/rbs#guides
+
 module ServiceCore
   VERSION: String
-  # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+
+  self.@logger: untyped
+
+  def self.logger: () -> untyped
+  def self.logger=: (untyped) -> untyped
+  def self.configure: () { (self) -> void } -> void
+
+  class Error < StandardError
+  end
 end
