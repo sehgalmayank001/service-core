@@ -296,6 +296,22 @@ end
 
 If you do not configure a logger, `ServiceCore.logger` defaults to `Rails.logger` when available, and otherwise to an `ActiveSupport::Logger` writing to `$stdout`.
 
+## Stability
+
+ServiceCore follows [Semantic Versioning](https://semver.org/). Starting with 1.0.0, the following are part of the public API and changes to them require a major version bump:
+
+- The four-key response contract (`status`, `data`, `message`, `errors`).
+- The Hash-compatible surface of `ServiceCore::Response` (`[]`, `[]=`, `==`, `to_h`, `to_s`, `inspect`, `keys`, `values`, `each`, `dig`, `fetch`, `key?` / `has_key?` / `include?`, `as_json`, `to_json`) and its named accessors (`status`, `data`, `message`, `errors`).
+- The `ServiceCore::FieldSet` API (`to_h` and named accessors per declared symbol field).
+- The service DSL: `include ServiceCore`, `field`, `validates`, `perform`, instance `#call` and class `.call`, `service.fields`, `service.response` / `service.output`.
+- The response builders: `success_response`, `error_response`, `formatted_response`, `set_output`.
+- The step-validation helpers: `add_error`, `add_error_and_validate`.
+- The reserved field names: `:call`, `:errors`, `:fields`, `:output`, `:perform`, `:response`.
+- The exception hierarchy under `ServiceCore::Error`.
+- `ServiceCore.logger` and `ServiceCore.configure`.
+
+The internals of `ServiceCore::Output`, the `Responder` mixin shape, and anything not listed above are implementation details and may change between minor releases.
+
 ## Compatibility
 
 - Ruby: 3.1 minimum; tested against 3.3 and 3.4 (and 4.0 against Rails 8.x).
