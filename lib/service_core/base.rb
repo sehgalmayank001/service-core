@@ -7,9 +7,6 @@ module ServiceCore
   module Base
     extend ActiveSupport::Concern
 
-    # NOTE: declaring `field :errors` would shadow ActiveModel::Validations#errors
-    # and silently break every validator on the service. The other names below
-    # would clobber methods the gem itself defines on every service.
     RESERVED_FIELD_NAMES = Set[:call, :errors, :fields, :output, :perform, :response].freeze
 
     included do
