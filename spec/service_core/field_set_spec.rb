@@ -25,7 +25,8 @@ RSpec.describe ServiceCore::FieldSet do
 
   describe "#inspect" do
     it "includes the class name and the hash form" do
-      expect(field_set.inspect).to eq('#<ServiceCore::FieldSet {first_name: "Ada", last_name: "Lovelace"}>')
+      expected = "#<ServiceCore::FieldSet #{{ first_name: "Ada", last_name: "Lovelace" }.inspect}>"
+      expect(field_set.inspect).to eq(expected)
     end
   end
 end

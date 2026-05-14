@@ -125,7 +125,8 @@ RSpec.describe ServiceCore::Response do
     end
 
     it "inspect includes the class name and the hash form" do
-      expect(result.inspect).to eq("#<ServiceCore::Response {status: \"success\", message: \"ok\"}>")
+      expected = "#<ServiceCore::Response #{{ status: "success", message: "ok" }.inspect}>"
+      expect(result.inspect).to eq(expected)
     end
   end
 
