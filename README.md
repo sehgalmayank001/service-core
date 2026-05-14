@@ -37,7 +37,7 @@ Every service responds with at most four keys:
 | `message` | High-level human context, distinct from per-field error detail.        |
 | `errors`  | Structured error detail (Hash, Array, ActiveModel::Errors, ...).       |
 
-The shape is enforced; the value types are not. Anything other than these four keys raises `ArgumentError`.
+The shape is enforced; the value types are not. Writing a key other than these four raises `ServiceCore::InvalidKey`.
 
 ## Defining a service
 
@@ -81,35 +81,19 @@ The instance method returns the response value object. The class-level `.call` r
 
 ## `Response`: the value object
 
-`service.response` (alias `service.output`, and the value returned from `#call`) is a `ServiceCore::Response`. It looks and feels like a Hash so existing callers continue to work, while also exposing named accessors:
+`service.response` (and the value returned from `#call`) is a `ServiceCore::Response`. It exposes both named accessors and Hash-style access, and serialises to JSON like the underlying hash:
 
 ```ruby
 response = GreetService.call(first_name: "John", last_name: "Doe").response
 
-# Named access
 response.status   # => "success"
 response.data     # => "John Doe"
-
-# Hash-style access (backward compatible)
 response[:status] # => "success"
-
-# Equality with a Hash
 response == { status: "success", message: "Hello, World", data: "John Doe" } # => true
-
-# JSON / pattern matching
-response.to_json
-case response
-in { status: "success", data: }
-  data
-end
+response.to_json  # => '{"status":"success","message":"Hello, World","data":"John Doe"}'
 ```
 
-Only the four allowed keys are accepted; anything else raises `ArgumentError`.
-
-ServiceCore distinguishes the *value* from the *builder*:
-
-- `ServiceCore::Response` is the value object — what a service emits.
-- `ServiceCore::Responder` is the mixin that gives a service the `success_response`, `error_response` and `formatted_response` helpers used inside `perform`. You include it transitively via `include ServiceCore`.
+Writing or reading a key other than the four allowed raises `ServiceCore::InvalidKey`.
 
 ## Declaring fields
 
@@ -126,9 +110,9 @@ class MyService
 end
 ```
 
-Typed fields are backed by `ActiveModel::Attributes` and inherit its casting and default support. Positional defaults of `false`, `nil`, or `0` are honoured.
+Typed fields are backed by `ActiveModel::Attributes` and inherit its casting and default support.
 
-The following names are reserved and cannot be used as field names because they would shadow methods the gem itself defines: `:call`, `:errors`, `:fields`, `:output`, `:perform`, `:response`. Declaring `field :errors` (for example) raises `ArgumentError`.
+The following names are reserved and cannot be used as field names because they would shadow methods the gem itself defines: `:call`, `:errors`, `:fields`, `:output`, `:perform`, `:response`. Declaring `field :errors` (for example) raises `ServiceCore::ReservedFieldName`.
 
 ### Field snapshot via `FieldSet`
 
@@ -193,11 +177,7 @@ def perform
 end
 ```
 
-If `status` is not set explicitly, it is auto-assigned to `"success"` when `errors` is blank, and `"error"` otherwise.
-
-### Falsy values are preserved
-
-`data: false`, `data: 0`, and `message: ""` are recorded faithfully. Only `nil` is treated as "not set" and skipped.
+If `status` is not set explicitly, it is auto-assigned to `"success"` when `errors` is blank, and `"error"` otherwise. `nil` is the only value treated as "not set"; `false`, `0`, and `""` are stored as-is.
 
 ## Validations
 
@@ -246,7 +226,7 @@ MyService.call(first_name: "abc").response
 # => {status: "error", message: "validation failure", errors: {last_name: ["can't be nil"]}}
 ```
 
-`add_error_and_validate(attribute, message, options = {})` forwards `options` to `ActiveModel::Errors#add`, so things like `strict: true` work the same way.
+`add_error_and_validate(attribute, message, options = {})` forwards `options` to `ActiveModel::Errors#add`, so options like `strict: true` are honoured.
 
 ## Logging errors
 
@@ -284,7 +264,7 @@ The current concrete subclasses are:
 - `ServiceCore::InvalidKey` — raised by `response[:not_allowed]` or `response[:not_allowed] = value` when the key is not one of the four allowed response keys.
 - `ServiceCore::ReservedFieldName` — raised by `field :errors` (or any other reserved name) at class-definition time.
 
-`Response#fetch` continues to raise `KeyError` and the default `perform` continues to raise a plain `StandardError` for Hash and ActiveModel parity respectively.
+Two raises stay on stdlib classes: `Response#fetch` raises `KeyError` to match `Hash#fetch`, and the default `perform` raises `StandardError` until the service overrides it.
 
 ## Configuration
 
@@ -310,7 +290,7 @@ ServiceCore follows [Semantic Versioning](https://semver.org/). Starting with 1.
 - The exception hierarchy under `ServiceCore::Error`.
 - `ServiceCore.logger` and `ServiceCore.configure`.
 
-The internals of `ServiceCore::Output`, the `Responder` mixin shape, and anything not listed above are implementation details and may change between minor releases.
+The internals of `ServiceCore::Output`, the `Responder` mixin shape, and anything not listed above are implementation details and may change between any release.
 
 ## Compatibility
 
