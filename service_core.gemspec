@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative "lib/service_core/version"
 
 Gem::Specification.new do |spec|
@@ -8,11 +6,13 @@ Gem::Specification.new do |spec|
   spec.authors = ["mayank sehgal"]
   spec.email = ["sehgalmayank001@gmail.com"]
 
-  spec.summary       = "A Rails service pattern implementation"
-  spec.description   = "A service pattern implementation for Rails applications."
+  spec.summary       = "A standardised service object pattern for Ruby and Rails"
+  spec.description   = "ServiceCore provides a four-key response contract (status, data, message, errors) " \
+                       "for service objects, with field declarations, validations, step validation, " \
+                       "structured logging, and a Hash-compatible Response value object."
   spec.homepage = "https://github.com/sehgalmayank001/service-core"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 2.7.0"
+  spec.required_ruby_version = ">= 3.1.0"
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
@@ -32,8 +32,8 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activemodel", ">= 6.1", "< 8.0"
-  spec.add_dependency "activesupport", ">= 6.1", "< 8.0"
+  spec.add_dependency("activemodel", ">= 6.1", "< 9.0")
+  spec.add_dependency("activesupport", ">= 6.1", "< 9.0")
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"

@@ -1,97 +1,176 @@
-# frozen_string_literal: true
-
-# spec/service_core/responses_spec.rb
-
 require "spec_helper"
 
-class ResponseService
-  include ServiceCore::Base
-  include ServiceCore::Response
-
-  def perform
-    success_response(message: "It worked!", data: { key: "value" })
-  end
-end
-
 RSpec.describe ServiceCore::Response do
-  let(:service) { ResponseService.new }
+  describe "#initialize" do
+    it "defaults status to 'initialized' and other keys to nil" do
+      result = described_class.new
+      expect(result.status).to eq("initialized")
+      expect(result.data).to be_nil
+      expect(result.message).to be_nil
+      expect(result.errors).to be_nil
+    end
 
-  describe "#success_response" do
-    it "returns a success response with a message and data" do
-      response = service.call
-      expect(response[:status]).to eq("success")
-      expect(response[:message]).to eq("It worked!")
-      expect(response[:data]).to eq(key: "value")
+    it "accepts keyword overrides" do
+      result = described_class.new(status: "success", data: { id: 1 }, message: "ok")
+      expect(result.status).to eq("success")
+      expect(result.data).to eq(id: 1)
+      expect(result.message).to eq("ok")
     end
   end
 
-  describe "#error_response" do
-    it "returns an error response with a message and errors" do
-      response = service.send(:error_response, message: "Something went wrong", errors: { name: ["can't be blank"] })
-      expect(response[:status]).to eq("error")
-      expect(response[:message]).to eq("Something went wrong")
-      expect(response[:errors]).to eq(name: ["can't be blank"])
+  describe "hash-style access" do
+    let(:result) { described_class.new(status: "success") }
+
+    it "reads via []" do
+      expect(result[:status]).to eq("success")
+      expect(result[:message]).to be_nil
+    end
+
+    it "writes via []=" do
+      result[:data] = { id: 1 }
+      expect(result.data).to eq(id: 1)
+    end
+
+    it "raises ServiceCore::InvalidKey for invalid read keys" do
+      expect { result[:invalid] }.to raise_error(
+        ServiceCore::InvalidKey, "Invalid key. Allowed keys are: status, data, message, errors"
+      )
+    end
+
+    it "raises ServiceCore::InvalidKey for invalid write keys" do
+      expect { result[:invalid] = "x" }.to raise_error(
+        ServiceCore::InvalidKey, "Invalid key. Allowed keys are: status, data, message, errors"
+      )
     end
   end
 
-  describe "#formatted_response" do
-    before do
-      service.instance_variable_set(:@output, {})
+  describe "#fetch" do
+    let(:result) { described_class.new(status: "success") }
+
+    it "returns the value when present" do
+      expect(result.fetch(:status)).to eq("success")
     end
 
-    context "when all arguments are provided" do
-      it "sets the output with all provided values" do
-        status = "success"
-        message = "Operation successful"
-        data = { key: "value" }
-        errors = { field: ["error message"] }
-
-        result = service.send(:formatted_response, status: status, message: message, data: data, errors: errors)
-
-        expect(result[:status]).to eq(status)
-        expect(result[:message]).to eq(message)
-        expect(result[:data]).to eq(data)
-        expect(result[:errors]).to eq(errors)
-      end
+    it "returns the default when value is nil" do
+      expect(result.fetch(:message, "fallback")).to eq("fallback")
     end
 
-    context "when optional arguments are not provided" do
-      it "sets the output with only the status" do
-        status = "success"
-
-        result = service.send(:formatted_response, status: status)
-
-        expect(result[:status]).to eq(status)
-        expect(result[:message]).to be_nil
-        expect(result[:data]).to be_nil
-        expect(result[:errors]).to be_nil
-      end
-
-      it "sets the output with status and message" do
-        status = "error"
-        message = "Something went wrong"
-
-        result = service.send(:formatted_response, status: status, message: message)
-
-        expect(result[:status]).to eq(status)
-        expect(result[:message]).to eq(message)
-        expect(result[:data]).to be_nil
-        expect(result[:errors]).to be_nil
-      end
+    it "yields when value is nil and a block is provided" do
+      expect(result.fetch(:message) { |k| "default for #{k}" }).to eq("default for message")
     end
 
-    context "when errors are provided" do
-      it "formats errors correctly" do
-        status = "error"
-        errors = { field: ["error message"] }
+    it "raises KeyError when no default and no block" do
+      expect { result.fetch(:message) }.to raise_error(KeyError, /message/)
+    end
 
-        allow(service).to receive(:error_messages).with(errors).and_return(errors)
+    it "raises KeyError for unknown keys (matching Hash#fetch)" do
+      expect { result.fetch(:invalid) }.to raise_error(KeyError)
+    end
 
-        result = service.send(:formatted_response, status: status, errors: errors)
+    it "uses the provided default for unknown keys" do
+      expect(result.fetch(:invalid, "fallback")).to eq("fallback")
+    end
+  end
 
-        expect(result[:status]).to eq(status)
-        expect(result[:errors]).to eq(errors)
-      end
+  describe "key/value introspection" do
+    let(:result) { described_class.new(status: "success", data: { id: 1 }) }
+
+    it "key? returns true only for set keys" do
+      expect(result.key?(:status)).to be true
+      expect(result.key?(:data)).to be true
+      expect(result.key?(:message)).to be false
+      expect(result.key?(:errors)).to be false
+    end
+
+    it "exposes Hash-compatible aliases" do
+      expect(result).to have_key(:status)
+      expect(result).to include(:status)
+    end
+
+    it "keys returns only set entries in canonical order" do
+      expect(result.keys).to eq(%i[status data])
+    end
+
+    it "values mirrors keys" do
+      expect(result.values).to eq(["success", { id: 1 }])
+    end
+
+    it "each_pair yields set entries" do
+      pairs = result.each_pair.to_a
+      expect(pairs).to eq([[:status, "success"], [:data, { id: 1 }]])
+    end
+  end
+
+  describe "#to_h" do
+    it "returns only set keys" do
+      result = described_class.new(status: "success", data: false)
+      expect(result.to_h).to eq(status: "success", data: false)
+    end
+
+    it "honours legitimate falsy values" do
+      result = described_class.new(status: "success", data: 0, message: "")
+      expect(result.to_h).to eq(status: "success", data: 0, message: "")
+    end
+
+    it "omits nil entries" do
+      expect(described_class.new(status: "success").to_h).to eq(status: "success")
+    end
+  end
+
+  describe "string representations" do
+    let(:result) { described_class.new(status: "success", message: "ok") }
+
+    it "to_s matches the hash form (puts compatibility)" do
+      expect(result.to_s).to eq({ status: "success", message: "ok" }.to_s)
+    end
+
+    it "inspect includes the class name and the hash form" do
+      expected = "#<ServiceCore::Response #{{ status: "success", message: "ok" }.inspect}>"
+      expect(result.inspect).to eq(expected)
+    end
+  end
+
+  describe "equality" do
+    let(:result) { described_class.new(status: "success", data: { id: 1 }) }
+
+    it "compares equal to an equivalent Hash" do
+      expect(result).to eq(status: "success", data: { id: 1 })
+    end
+
+    it "compares equal to another Response with the same contents" do
+      expect(result).to eq(described_class.new(status: "success", data: { id: 1 }))
+    end
+
+    it "is unequal to a Hash with different contents" do
+      expect(result).not_to eq(status: "error")
+    end
+  end
+
+  describe "#dig" do
+    let(:result) { described_class.new(data: { user: { name: "Ada" } }) }
+
+    it "drills into nested values" do
+      expect(result.dig(:data, :user, :name)).to eq("Ada")
+    end
+
+    it "returns nil when an intermediate value is missing" do
+      expect(result.dig(:data, :user, :missing)).to be_nil
+    end
+
+    it "returns nil for an unknown root key (matching Hash#dig)" do
+      expect(result.dig(:invalid, :anything)).to be_nil
+    end
+  end
+
+  describe "JSON serialisation" do
+    let(:result) { described_class.new(status: "success", data: { id: 1 }) }
+
+    it "as_json returns the hash form" do
+      expect(result.as_json).to eq("status" => "success", "data" => { "id" => 1 })
+    end
+
+    it "to_json serialises like the hash form" do
+      expect(result.to_json).to eq({ status: "success", data: { id: 1 } }.to_json)
     end
   end
 end

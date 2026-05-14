@@ -1,51 +1,49 @@
-# frozen_string_literal: true
-
 require "active_support/concern"
 require "active_model"
-require_relative "response"
+require "set"
+require_relative "responder"
 
 module ServiceCore
   module Base
     extend ActiveSupport::Concern
 
+    RESERVED_FIELD_NAMES = Set[:call, :errors, :fields, :output, :perform, :response].freeze
+
     included do
-      # ServiceCore::Response is included first as it inherited output,
-      # which too has initialize method.
-      include ServiceCore::Response
+      # NOTE: Responder is included first so its initialize (inherited
+      # from Output) runs at the bottom of the super chain.
+      include ServiceCore::Responder
       include ActiveModel::Model
       include ActiveModel::Attributes
       include ActiveModel::Validations
 
-      # NOTE: fields attribute will hold the fields defined and their values
+      # NOTE: fields holds a ServiceCore::FieldSet snapshot of declared
+      # fields and their values at initialize time.
       attr_reader :fields
 
       class << self
-        # Wrapper method to define attribuutes and attr_accessor methods on object
-        def fields_defined
-          @fields_defined ||= {}
+        def field_names
+          @field_names ||= Set.new
         end
 
         def field(name, *args, **opts)
           # field :active, :boolean, default: true
           # field :active, type: :boolean, default: true
-          # Both explicit and implicit definitions are handled
-          type = args[0] || opts[:type]
-          default = args[1] || opts[:default]
+          # field :active, :boolean, false   # positional default
+          # field :payload                   # untyped (hash/array/object)
+          ensure_field_name_available!(name)
+          type = args.first || opts[:type]
+          # NOTE: arity check, not `||`, so a positional default of
+          # `false` or `nil` is not silently swallowed by opts[:default].
+          default = args.length >= 2 ? args[1] : opts[:default]
 
-          # NOTE: -
-          # ActiveModel::Attributes support only basic data types
-          # for ActiveRecord objects we use attr_accessor through ActiveModel::Model
-          # define attr_accessor to make instance variables also available for attributes
-
-          # define attribute if type is available to type cast
           if type
             attribute(name, type, default: default)
           else
             attr_accessor(name)
           end
 
-          # save fields defind as an hash, makes it easier to check
-          fields_defined[name] = default
+          field_names.add(name)
         end
 
         def call(attributes = {})
@@ -53,16 +51,24 @@ module ServiceCore
           obj.call
           obj
         end
+
+        private
+
+        def ensure_field_name_available!(name)
+          return unless ServiceCore::Base::RESERVED_FIELD_NAMES.include?(name)
+
+          raise(
+            ServiceCore::ReservedFieldName,
+            "`#{name}` is reserved by ServiceCore and cannot be used as a field name"
+          )
+        end
       end
 
       def initialize(attributes = {})
         super
         @local_errors = {}
-        @fields = {}
-        # NOTE: this helps identify values passed from values updated
-        self.class.fields_defined.each_key do |name|
-          @fields[name] = send(name)
-        end
+        snapshot = self.class.field_names.to_h { |name| [name, send(name)] }
+        @fields = ServiceCore::FieldSet.new(snapshot)
       end
 
       def call

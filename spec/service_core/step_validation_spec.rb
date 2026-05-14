@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # spec/service_core/step_validations_spec.rb
 
 require "spec_helper"
@@ -13,7 +11,7 @@ class ValidationService
   validates :name, presence: true
 
   def perform
-    @output[:message] = "Validated, #{@fields[:name]}"
+    @output[:message] = "Validated, #{name}"
   end
 end
 
