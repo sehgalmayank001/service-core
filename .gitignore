@@ -12,6 +12,10 @@
 
 *.gem
 
+# Debugger history files
+.byebug_history
+.debug_history
+
 # Appraisal lockfiles are regenerated per Ruby/Rails combination.
 gemfiles/*.gemfile.lock
 gemfiles/.bundle/
