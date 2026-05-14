@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   underlying hash is frozen.
 - `field` now accepts positional defaults of any value, including `false`,
   `nil`, `0`, and `""`. The keyword form is unchanged.
+- `field` raises `ArgumentError` when the declared name would shadow a
+  ServiceCore method. The reserved names are `:call`, `:errors`, `:fields`,
+  `:output`, `:perform` and `:response`. Previously these names silently
+  overrode gem internals (most dangerously `:errors`, which broke
+  `ActiveModel::Validations`).
 - Cross-Rails test matrix using `appraisal`: Rails 7.2, 8.0 and 8.1.
 - CI matrix expanded to Ruby 3.3, 3.4 and 4.0 (excluding Ruby 4.0 + Rails 7.2).
 - This `CHANGELOG.md` is now structured per Keep a Changelog.

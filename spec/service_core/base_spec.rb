@@ -77,6 +77,16 @@ RSpec.describe ServiceCore::Base do
     end
   end
 
+  describe "reserved field names" do
+    it "raises when a field name would shadow a gem method" do
+      ServiceCore::Base::RESERVED_FIELD_NAMES.each do |reserved|
+        expect do
+          Class.new { include ServiceCore::Base }.field(reserved, :string)
+        end.to raise_error(ArgumentError, /reserved by ServiceCore/)
+      end
+    end
+  end
+
   describe "field defaults" do
     let(:service) { DefaultsService.new }
 

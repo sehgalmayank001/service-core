@@ -128,6 +128,8 @@ end
 
 Typed fields are backed by `ActiveModel::Attributes` and inherit its casting and default support. Positional defaults of `false`, `nil`, or `0` are honoured.
 
+The following names are reserved and cannot be used as field names because they would shadow methods the gem itself defines: `:call`, `:errors`, `:fields`, `:output`, `:perform`, `:response`. Declaring `field :errors` (for example) raises `ArgumentError`.
+
 ### Field snapshot via `FieldSet`
 
 After construction, `service.fields` exposes an immutable snapshot of the declared fields and their values as a `ServiceCore::FieldSet`. Each declared symbol field is available as a real method; call `to_h` if you need a plain Hash.

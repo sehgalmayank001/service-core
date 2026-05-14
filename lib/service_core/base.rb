@@ -7,6 +7,11 @@ module ServiceCore
   module Base
     extend ActiveSupport::Concern
 
+    # NOTE: declaring `field :errors` would shadow ActiveModel::Validations#errors
+    # and silently break every validator on the service. The other names below
+    # would clobber methods the gem itself defines on every service.
+    RESERVED_FIELD_NAMES = Set[:call, :errors, :fields, :output, :perform, :response].freeze
+
     included do
       # NOTE: Responder is included first so its initialize (inherited
       # from Output) runs at the bottom of the super chain.
@@ -29,6 +34,7 @@ module ServiceCore
           # field :active, type: :boolean, default: true
           # field :active, :boolean, false   # positional default
           # field :payload                   # untyped (hash/array/object)
+          ensure_field_name_available!(name)
           type = args.first || opts[:type]
           # NOTE: arity check, not `||`, so a positional default of
           # `false` or `nil` is not silently swallowed by opts[:default].
@@ -47,6 +53,14 @@ module ServiceCore
           obj = new(attributes)
           obj.call
           obj
+        end
+
+        private
+
+        def ensure_field_name_available!(name)
+          return unless ServiceCore::Base::RESERVED_FIELD_NAMES.include?(name)
+
+          raise(ArgumentError, "`#{name}` is reserved by ServiceCore and cannot be used as a field name")
         end
       end
 
