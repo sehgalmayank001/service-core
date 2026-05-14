@@ -41,7 +41,6 @@ module ServiceCore
     end
     alias has_key? key?
     alias include? key?
-    alias member? key?
 
     def keys
       ALLOWED_KEYS.select { |key| key?(key) }
@@ -81,11 +80,6 @@ module ServiceCore
       else super
       end
     end
-    alias eql? ==
-
-    def hash
-      to_h.hash
-    end
 
     def dig(key, *rest)
       return nil unless ALLOWED_KEYS.include?(key)
@@ -94,12 +88,6 @@ module ServiceCore
       return value if rest.empty? || value.nil?
 
       value.respond_to?(:dig) ? value.dig(*rest) : nil
-    end
-
-    # NOTE: enables pattern matching, e.g. `case response in { status:, data: }`
-    def deconstruct_keys(keys)
-      hash = to_h
-      keys ? hash.slice(*keys) : hash
     end
 
     def as_json(options = nil)

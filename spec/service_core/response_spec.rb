@@ -143,10 +143,6 @@ RSpec.describe ServiceCore::Response do
     it "is unequal to a Hash with different contents" do
       expect(result).not_to eq(status: "error")
     end
-
-    it "exposes a hash code consistent with to_h" do
-      expect(result.hash).to eq(result.to_h.hash)
-    end
   end
 
   describe "#dig" do
@@ -162,20 +158,6 @@ RSpec.describe ServiceCore::Response do
 
     it "returns nil for an unknown root key (matching Hash#dig)" do
       expect(result.dig(:invalid, :anything)).to be_nil
-    end
-  end
-
-  describe "pattern matching" do
-    it "supports `case ... in { status:, data: }` matching" do
-      result = described_class.new(status: "success", data: { id: 1 })
-      matched =
-        case result
-        in { status: "success", data: }
-          data
-        else
-          nil
-        end
-      expect(matched).to eq(id: 1)
     end
   end
 
