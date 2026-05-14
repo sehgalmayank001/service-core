@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.summary       = "A standardised service object pattern for Ruby and Rails"
   spec.description   = "ServiceCore provides a four-key response contract (status, data, message, errors) " \
                        "for service objects, with field declarations, validations, step validation, " \
-                       "structured logging, and a Hash-compatible Result value object."
+                       "structured logging, and a Hash-compatible Response value object."
   spec.homepage = "https://github.com/sehgalmayank001/service-core"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1.0"

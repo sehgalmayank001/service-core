@@ -240,7 +240,7 @@ class MyService
   end
 end
 
-MyService.call(first_name: "abc").output
+MyService.call(first_name: "abc").response
 # => {status: "error", message: "validation failure", errors: {last_name: ["can't be nil"]}}
 ```
 

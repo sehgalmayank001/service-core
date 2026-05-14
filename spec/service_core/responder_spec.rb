@@ -1,4 +1,4 @@
-# spec/service_core/responses_spec.rb
+# spec/service_core/responder_spec.rb
 
 require "spec_helper"
 
