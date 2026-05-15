@@ -9,16 +9,13 @@ This keeps controllers, jobs, and other callers from having to handle a differen
 ## Features
 
 - Four-key response contract: `status`, `data`, `message`, and `errors`
-
 - Field declarations with types, defaults, and ActiveModel validations
-
 - Step-by-step validation that survives `valid?` calls
-
 - Works on Ruby >= 3.1 and Rails / ActiveModel / ActiveSupport 6.1 through 8.x
 
 ## Background
 
-ServiceCore is based on the response shape described in
+ServiceCore follows the response shape described in
 
 [The Shape of a Service Response](https://agnosticlogic.substack.com/p/the-shape-of-a-service-response).
 
