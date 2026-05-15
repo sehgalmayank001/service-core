@@ -5,7 +5,6 @@ ServiceCore is a small Ruby gem that gives service objects a shared shape. Every
 - Four-key response contract: **status**, **data**, **message**, **errors**.
 - Field declarations with types, defaults, and ActiveModel validations.
 - Step-by-step validation that survives `valid?` calls.
-- Hash-compatible value objects (`Response`, `FieldSet`) instead of raw hashes.
 - Works on Ruby >= 3.1 and Rails (ActiveModel/ActiveSupport) 6.1 through 8.x.
 
 ## Installation
