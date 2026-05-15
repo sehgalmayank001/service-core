@@ -1,11 +1,26 @@
 # ServiceCore
 
-ServiceCore is a small Ruby gem that gives service objects a shared shape. Every service exposes a single `call` method and returns the same four-key response, regardless of who wrote it. The idea behind the shape is unpacked in [The Shape of a Service Response](https://agnosticlogic.substack.com/p/the-shape-of-a-service-response).
+A tiny contract layer for Rails service objects: typed inputs, step validation, and predictable four-key responses.
 
-- Four-key response contract: **status**, **data**, **message**, **errors**.
-- Field declarations with types, defaults, and ActiveModel validations.
-- Step-by-step validation that survives `valid?` calls.
-- Works on Ruby >= 3.1 and Rails (ActiveModel/ActiveSupport) 6.1 through 8.x.
+ServiceCore gives Rails service objects a shared shape. Every service exposes a single call interface and returns the same response contract regardless of who wrote it.
+
+This keeps controllers, jobs, and other callers from having to handle a different return style for every service object.
+
+## Features
+
+- Four-key response contract: `status`, `data`, `message`, and `errors`
+
+- Field declarations with types, defaults, and ActiveModel validations
+
+- Step-by-step validation that survives `valid?` calls
+
+- Works on Ruby >= 3.1 and Rails / ActiveModel / ActiveSupport 6.1 through 8.x
+
+## Background
+
+ServiceCore is based on the response shape described in
+
+[The Shape of a Service Response](https://agnosticlogic.substack.com/p/the-shape-of-a-service-response).
 
 ## Installation
 
